@@ -1,0 +1,77 @@
+<!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar">
+
+    <ul class="sidebar-nav" id="sidebar-nav">
+
+      <li class="nav-item">
+        <a class="nav-link " href="/">
+          <i class="bi bi-grid"></i>
+          <span>Overview</span>
+        </a>
+      </li><!-- End Dashboard Nav -->
+
+      <li class="nav-item" sec:authorize="hasRole('PROCUREMENT')">
+        <a class="nav-link collapsed" href="/inventory/products">
+          <i class="bi bi-box-seam"></i>
+          <span>Products</span>
+        </a>
+      </li><!-- End Products Page Nav -->
+      <li class="nav-item" sec:authorize="hasRole('PROCUREMENT')">
+        <a class="nav-link collapsed" href="/inventory/transfers">
+          <i class="bi bi-arrow-repeat"></i>
+          <span>Transfers</span>
+        </a>
+      </li><!-- End Transfers Page Nav -->
+
+      <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+        <a class="nav-link collapsed" href="/admin/users">
+          <i class="bi bi-person"></i>
+          <span>Users</span>
+        </a>
+      </li><!-- End Users Page Nav -->
+
+      <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+        <a class="nav-link collapsed" href="/admin/roles">
+          <i class="bi bi-question-circle"></i>
+          <span>Roles</span>
+        </a>
+      </li><!-- End Roles Page Nav -->
+
+      <li class="nav-item" sec:authorize="hasAnyRole('ADMIN', 'MANAGER')">
+        <a class="nav-link collapsed" href="/branches">
+          <i class="bi bi-diagram-3"></i>
+          <span>Branches</span>
+        </a>
+      </li><!-- End Stores Page Nav -->
+
+      <li class="nav-item" sec:authorize="hasAnyRole('MANAGER')">
+        <a class="nav-link collapsed" href="/employees">
+          <i class="bi bi-people-fill"></i>
+          <span>Employees</span>
+        </a>
+      </li><!-- End Employees Page Nav -->
+
+      <li class="nav-item" sec:authorize="hasAnyRole('MANAGER', 'PROCUREMENT', 'CASHIER')">
+        <a class="nav-link collapsed" href="/sales">
+          <i class="bi bi-cart-check"></i>
+          <span>Sales</span>
+        </a>
+      </li><!-- End Sales Page Nav -->
+
+      <li class="nav-item" sec:authorize="hasAnyRole('MANAGER', 'PROCUREMENT', 'CASHIER')">
+        <a class="nav-link collapsed" href="/pos">
+          <i class="bi bi-shop"></i>
+          <span>POS</span>
+        </a>
+      </li><!-- End POS Page Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-bs-toggle="modal" data-bs-target="#logout">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Logout</span>
+        </a>
+      </li><!-- End Logout Page Nav -->
+
+    </ul>
+
+  </aside><!-- End Sidebar-->

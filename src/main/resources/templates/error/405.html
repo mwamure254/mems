@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:replace="~{partials/_header :: common_header(~{::title/text()},~{::link},~{::meta})}">
+    <!-- Custom meta data for this template-->
+    <meta name="description" content="mpos error page">
+    <meta name="author" content="mfano">
+
+    <!-- Custom title for this page-->
+    <title>405 - Method Not Allowed</title>
+
+    <!-- Custom styles for this page-->
+</th:block>
+
+<body>
+    <div class="container min-vh-100 d-flex align-items-center justify-content-center">
+        <div class="text-center">
+            <!-- Error Icon -->
+            <div class="mb-4">
+                <i class="mdi mdi-close-circle-outline" style="font-size: 100px;"></i>
+            </div>
+
+            <!-- Error Code -->
+            <h1 class="display-1 fw-bold">405</h1>
+
+            <!-- Message -->
+            <h2 class="mb-3">Method Not Allowed</h2>
+
+            <p class="text-muted mb-4">
+                The request method used for this page is not allowed.
+                Please check the action and try again.
+            </p>
+
+            <!-- Actions -->
+            <a th:href="@{/}" class="btn btn-outline-primary me-2">
+                <i class="mdi mdi-home-outline me-1"></i>
+                Go Home
+            </a>
+
+            <button type="button" class="btn btn-outline-secondary" onclick="history.back()">
+                <i class="mdi mdi-arrow-left me-1"></i>
+                Go Back
+            </button>
+
+        </div>
+    </div>
+</body>
+
+</html>
