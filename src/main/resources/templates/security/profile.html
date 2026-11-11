@@ -3,10 +3,10 @@
 
 <th:block th:replace="~{partials/_header :: common_header(~{::title/text()},~{::link},~{::meta})}">
   <!-- Custom meta data for this template-->
-  <meta name="description" content="meo home page">
+  <meta name="description" content="mems profile page">
   <meta name="author" content="mfano">
   <!-- Custom title for this page-->
-  <title>MPOS | Profile</title>
+  <title>MEMS | Profile</title>
   <!-- Custom styles for this page-->
 </th:block>
 
@@ -22,13 +22,29 @@
 
   <main id="main" class="main d-flex flex-column min-vh-100">
 
-    <div class="pagetitle my-4">
-      <h3>Profile</h3>
-      <nav class="bg-dark">
+    <!-- Page Heading -->
+    <div class="pagetitle d-sm-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h1 class="h3 mb-1"><span th:text="${author.fin}"></span>
+          profile</h1>
+        <p class="mb-0 text-muted small">
+          Review and edit personal information.
+        </p>
+      </div>
+
+      <!-- Breadcrumb -->
+      <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-door"></i>
-              <span>Home</span></a></li>
-          <li class="breadcrumb-item active"><i class="bi bi-record-fill"></i>Profile</li>
+          <li class="breadcrumb-item">
+            <a th:href="@{/}">
+              <i class="bi bi-house-door me-1"></i>
+              Dashboard
+            </a>
+          </li>
+          <li class="breadcrumb-item">
+            <a th:href="@{/}">User</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">Profile</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -165,8 +181,8 @@
                     <div class="row mb-3">
                       <label for="about" class="col-md-4 col-lg-3 col-form-label">About</label>
                       <div class="col-md-8 col-lg-9">
-                        <textarea th:field="*{about}" class="form-control" id="about"
-                          style="height: 100px" required>Sunt est soluta temporibus accusantium neque nam maiores cumque temporibus. Tempora libero non est unde veniam est qui dolor. Ut sunt iure rerum quae quisquam autem eveniet perspiciatis odit. Fuga sequi sed ea saepe at unde.</textarea>
+                        <textarea th:field="*{about}" class="form-control" id="about" style="height: 100px"
+                          required>Sunt est soluta temporibus accusantium neque nam maiores cumque temporibus. Tempora libero non est unde veniam est qui dolor. Ut sunt iure rerum quae quisquam autem eveniet perspiciatis odit. Fuga sequi sed ea saepe at unde.</textarea>
                       </div>
                     </div>
 
@@ -252,8 +268,8 @@
                     <div class="row mb-3">
                       <label for="Email" class="col-md-4 col-lg-3 col-form-label">Email</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="email" type="email" class="form-control" id="Email"
-                          th:value="${profile.email}" readonly>
+                        <input name="email" type="email" class="form-control" id="Email" th:value="${profile.email}"
+                          readonly>
                       </div>
                     </div>
 
@@ -389,8 +405,8 @@
             Confirm to Remove image
             <form class="py-2 px-4" th:action="@{/image/delete/{id}(id=${profile.user})}" method="post">
               <div class="text-center">
-                <a class="btn btn-sm btn-warning" data-bs-dismiss="modal">Cancel</a>
-                <button class="btn btn-sm btn-success" type="submit">Remove</button>
+                <a class="btn btn-sm btn-outline-warning" data-bs-dismiss="modal">Cancel</a>
+                <button class="btn btn-sm btn-outline-success" type="submit">Remove</button>
               </div>
             </form>
           </div>

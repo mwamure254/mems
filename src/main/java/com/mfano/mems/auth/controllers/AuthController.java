@@ -21,6 +21,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.mfano.mems.config.CustomUserDetails;
 import com.mfano.mems.dtos.UserDto;
+import com.mfano.mems.utils.documents.FileUpload;
+
+import lombok.RequiredArgsConstructor;
+
 import com.mfano.mems.auth.models.Profile;
 import com.mfano.mems.auth.models.User;
 import com.mfano.mems.auth.services.AuditService;
@@ -29,22 +33,14 @@ import com.mfano.mems.auth.services.RoleService;
 import com.mfano.mems.auth.services.UserService;
 
 @Controller
+@RequiredArgsConstructor 
 public class AuthController {
     private final UserService userService;
     private final RoleService roleService;
     private final ProfileService profileService;
     private final AuditService auditService;
-    private final PasswordEncoder passwordEncoder;
+    private final FileUpload fileUpload;
     private String login = "redirect:/login";
-
-    public AuthController(UserService userService, RoleService roleService, ProfileService profileService,
-            AuditService auditService, PasswordEncoder passwordEncoder) {
-        this.userService = userService;
-        this.roleService = roleService;
-        this.profileService = profileService;
-        this.auditService = auditService;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     // guest user
     @GetMapping("/")
@@ -80,8 +76,7 @@ public class AuthController {
         } else if (roles.contains("ROLE_LIBRARY")) {
             return "redirect:/library/dashboard";
         } else {
-            model.addFlashAttribute("error", "Please contact the system admin for role mapping.");
-            return login;
+            return "redirect:/guest/dashboard";
         }
 
     }
@@ -127,7 +122,7 @@ public class AuthController {
             return login;
         } else {
             userService.getPrices(auth, model);
-
+            model.addAttribute("profile", profileService.checkProfile(auth.getId()));
             return "security/profile";
         }
     }
@@ -136,10 +131,14 @@ public class AuthController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/profile/update")
     public String userProfileUpdate(@AuthenticationPrincipal CustomUserDetails auth,
-            @ModelAttribute("profile") Profile profile) {
-
-        profileService.update(auth.getId(), profile);
-        auditService.record("update_profile", "SUCCESS", "user id=" + auth.getId() + "Updated their profile");
+            @ModelAttribute("profile") Profile profile,
+            RedirectAttributes red) {
+        User user = userService.findByEmail(auth.getUsername());
+        try {
+            profileService.update(user.getId(), profile, red, user.getBranch().getId());
+        } catch (Exception e) {
+            red.addFlashAttribute("error", "Something went wrong, try again later.");
+        }
         return "redirect:/profile";
     }
 
@@ -147,13 +146,17 @@ public class AuthController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/image/update/{userid}")
     public String imageUpdate(@PathVariable Long userid, @RequestParam("image") MultipartFile file,
-            RedirectAttributes red) {
+            RedirectAttributes red, @AuthenticationPrincipal CustomUserDetails user) {
         try {
-            profileService.updateProfileImage(userid, file, red);
+            String image = "";
+            if (file != null && !file.isEmpty()) {
+                image = fileUpload.uploadFile(file, "profiles", red);
+            }
+            profileService.updateProfileImage(userid, image, red);
         } catch (IOException e) {
             red.addFlashAttribute("error", e.getMessage());
         }
-        auditService.record("update_image", "SUCCESS", "user id=" + userid + "Updated their profile image");
+        auditService.record(user.getBranch().getId(), "update_image", "SUCCESS", "user updated their profile image");
         red.addFlashAttribute("message", "Image updated successfully.");
         return "redirect:/profile";
     }
@@ -161,13 +164,14 @@ public class AuthController {
     // delete user image
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/image/delete/{userid}")
-    public String imageDelete(@PathVariable Long userid, RedirectAttributes red) {
+    public String imageDelete(@PathVariable Long userid, RedirectAttributes red,
+         @AuthenticationPrincipal CustomUserDetails user) {
         try {
             profileService.deleteProfileImage(userid, red);
         } catch (IOException e) {
             red.addFlashAttribute("error", e.getMessage());
         }
-        auditService.record("delete_image", "SUCCESS", "user id=" + userid + "Deleted their profile image");
+        auditService.record(user.getBranch().getId(), "delete_image", "SUCCESS", "user deleted their profile image");
         red.addFlashAttribute("message", "Image deleted successfully.");
         return "redirect:/profile";
     }
@@ -184,7 +188,7 @@ public class AuthController {
             @AuthenticationPrincipal CustomUserDetails auth, Model model) {
         userService.getPrices(auth, model);
         model.addAttribute("query", query);
-        //model.addAttribute("results", searchService.search(query));
+        // model.addAttribute("results", searchService.search(query));
 
         return "security/search";
     }
@@ -210,17 +214,16 @@ public class AuthController {
     }
 
     @PostMapping("/resend")
-    public String resendSubmit(@RequestParam("email") String email, Model model) {
+    public String resendSubmit(@RequestParam("email") String email, RedirectAttributes red) {
         User user = userService.findByEmail(email);
         if (user == null) {
-            model.addAttribute("error", "No account with that email.");
+            red.addAttribute("error", "No account with that email.");
             return "security/resend";
-        } else if (user.isEnabled()) {
-            model.addAttribute("message", "Email already verified. You can login.");
+        } else if (user.isActive()) {
+            red.addAttribute("message", "Email already verified. You can login.");
             return login;
         } else {
-            userService.createAndSendToken(user);
-            model.addAttribute("message", "Verification email resent. Check your inbox.");
+            userService.createAndSendToken(user, red);
             return login;
         }
     }
@@ -239,8 +242,7 @@ public class AuthController {
         }
 
         try {
-            userService.createPasswordResetToken(email);
-            model.addFlashAttribute("message", "Check your email, a reset link was sent.");
+            userService.createPasswordResetToken(email, model);
         } catch (Exception e) {
             model.addFlashAttribute("error", "Something went wrong, please try again.");
             return "redirect:/forgot";
@@ -284,20 +286,18 @@ public class AuthController {
     public String resetPassword(@AuthenticationPrincipal CustomUserDetails auth, @RequestParam String password,
             @RequestParam String NP,
             RedirectAttributes red) {
-        User user = userService.findById(auth.getId());
         if (!NP.equals(password) || NP.isEmpty() || password.isEmpty()) {
             red.addFlashAttribute("error", "Passwords do not match");
             return "redirect:/profile";
-        }
-
-        if (user != null) {
-            user.setPassword(passwordEncoder.encode(password));
-            userService.save(user);
-            auditService.record("reset_password", "SUCCESS", "user id=" + user.getId() + "Reset password");
-            red.addFlashAttribute("message", "Password reset successful");
-            return "redirect:/profile";
         } else {
-            red.addFlashAttribute("error", "Failed to reset password");
+            try {
+
+                userService.changePassword(auth, password, red);
+            } catch (Exception e) {
+
+                red.addFlashAttribute("error", "Failed to reset password");
+            }
+
             return "redirect:/profile";
         }
     }

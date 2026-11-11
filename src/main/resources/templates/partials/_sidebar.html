@@ -1,77 +1,100 @@
 <!-- ======= Sidebar ======= -->
-  <aside id="sidebar" class="sidebar">
+<aside id="sidebar" class="sidebar">
 
-    <ul class="sidebar-nav" id="sidebar-nav">
+  <div class="p-4 align-items-center text-center ">
+    <div class="bg-warning rounded-circle me-2">
+      <i class="bx bxs-graduation text-dark" style="font-size:30px;"></i>
+    </div>
+    <div class="justify-content-center">
+      <h6 class="mb-0 fw-bold" th:text="${author.branch?.name}">SHAKADULO</h6>
+      <small style="font-size:10px;">COMPREHENSIVE SCHOOL</small>
+    </div>
+  </div>
 
-      <li class="nav-item">
-        <a class="nav-link " href="/">
-          <i class="bi bi-grid"></i>
-          <span>Overview</span>
-        </a>
-      </li><!-- End Dashboard Nav -->
+  <ul class="sidebar-nav" id="sidebar-nav">
 
-      <li class="nav-item" sec:authorize="hasRole('PROCUREMENT')">
-        <a class="nav-link collapsed" href="/inventory/products">
-          <i class="bi bi-box-seam"></i>
-          <span>Products</span>
-        </a>
-      </li><!-- End Products Page Nav -->
-      <li class="nav-item" sec:authorize="hasRole('PROCUREMENT')">
-        <a class="nav-link collapsed" href="/inventory/transfers">
-          <i class="bi bi-arrow-repeat"></i>
-          <span>Transfers</span>
-        </a>
-      </li><!-- End Transfers Page Nav -->
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/">
+        <i class="bi bi-grid-fill"></i>
+        <span>Overview</span>
+      </a>
+    </li><!-- End Dashboard Nav -->
 
-      <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-        <a class="nav-link collapsed" href="/admin/users">
-          <i class="bi bi-person"></i>
-          <span>Users</span>
-        </a>
-      </li><!-- End Users Page Nav -->
+    <li sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL', 'TEACHER')" class="nav-item">
+      <a class="nav-link collapsed" href="#"><i class="ri ri-folder-user-fill me-2"></i> Teaching Staff</a>
+    </li><!-- End Teaching Staff Nav -->
 
-      <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-        <a class="nav-link collapsed" href="/admin/roles">
-          <i class="bi bi-question-circle"></i>
-          <span>Roles</span>
-        </a>
-      </li><!-- End Roles Page Nav -->
+    <li sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL')" class="nav-item">
+      <a class="nav-link collapsed" href="#"><i class="bi bi-person-lines-fill me-2"></i> Support Staff</a>
+    </li><!-- End support Staff Nav -->
 
-      <li class="nav-item" sec:authorize="hasAnyRole('ADMIN', 'MANAGER')">
-        <a class="nav-link collapsed" href="/branches">
-          <i class="bi bi-diagram-3"></i>
-          <span>Branches</span>
-        </a>
-      </li><!-- End Stores Page Nav -->
+    <li sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL', 'TEACHER', 'BURSAR', 'LIBRARY')" class="nav-item">
+      <a class="nav-link collapsed" href="#"><i class="bi bi-clock-fill me-2"></i> Staff Attendance</a>
+    </li><!-- End Staff Attendance Nav -->
 
-      <li class="nav-item" sec:authorize="hasAnyRole('MANAGER')">
-        <a class="nav-link collapsed" href="/employees">
-          <i class="bi bi-people-fill"></i>
-          <span>Employees</span>
-        </a>
-      </li><!-- End Employees Page Nav -->
+    <li sec:authorize="hasRole('PRINCIPAL')" class="nav-item">
+      <a class="nav-link collapsed" href="/students"><i class="bi bi-person-plus-fill me-2"></i> Admission</a>
+    </li><!-- End Admission Nav -->
 
-      <li class="nav-item" sec:authorize="hasAnyRole('MANAGER', 'PROCUREMENT', 'CASHIER')">
-        <a class="nav-link collapsed" href="/sales">
-          <i class="bi bi-cart-check"></i>
-          <span>Sales</span>
-        </a>
-      </li><!-- End Sales Page Nav -->
+    <li sec:authorize="hasAnyRole('PRINCIPAL', 'TEACHER')" class="nav-item">
+      <a class="nav-link collapsed" href="#"><i class="bi bi-people-fill me-2"></i> Students</a>
+    </li><!-- End Students Nav -->
 
-      <li class="nav-item" sec:authorize="hasAnyRole('MANAGER', 'PROCUREMENT', 'CASHIER')">
-        <a class="nav-link collapsed" href="/pos">
-          <i class="bi bi-shop"></i>
-          <span>POS</span>
-        </a>
-      </li><!-- End POS Page Nav -->
+    <li sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL', 'TEACHER')" class="nav-item">
+      <a class="nav-link collapsed" href="#"><i class="bi bi-building-fill me-2"></i> Streams</a>
+    </li><!-- End Accounts Nav -->
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-bs-toggle="modal" data-bs-target="#logout">
-          <i class="bi bi-box-arrow-right"></i>
-          <span>Logout</span>
-        </a>
-      </li><!-- End Logout Page Nav -->
 
-    </ul>
+    <li sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL', 'TEACHER')" class="nav-item">
+      <a class="nav-link collapsed" href="#"><i class="bi bi-book-half me-2"></i> Subjects</a>
+    </li><!-- End Subjects Nav -->
 
-  </aside><!-- End Sidebar-->
+    <li sec:authorize="hasAnyRole('LIBRARY', 'PRINCIPAL', 'TEACHER', 'STUDENT')" class="nav-item">
+      <a class="nav-link collapsed" href="#"><i class="bx bx-book me-2"></i> Library</a>
+    </li><!-- End Library Nav -->
+
+    <li sec:authorize="hasAnyRole('PRINCIPAL', 'TEACHER', 'BURSAR', 'STUDENT')" class="nav-item">
+      <a class="nav-link collapsed" href="#"><i class="bi bi-wallet-fill me-2"></i> Fees</a>
+    </li><!-- End Fees Nav -->
+
+    <li sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL', 'TEACHER')" class="nav-item">
+      <a class="nav-link collapsed" href="#"><i class="bi bi-card-list me-2"></i> Examination</a>
+    </li><!-- End Examination Nav -->
+
+    <li sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT')" class="nav-item">
+      <a class="nav-link collapsed" href="#"><i class="bi bi-layout-text-window me-2"></i> Report Cards</a>
+    </li><!-- End Report Cards Nav -->
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/announcements"><i class="bi bi-megaphone-fill me-2"></i> Announcements</a>
+    </li><!-- End Report Cards Nav -->
+
+    <li sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL')" class="nav-item">
+      <a class="nav-link collapsed" href="#"><i class="bi bi-arrow-left-right me-2"></i> Transfers</a>
+    </li><!-- End transfers Nav -->
+
+    <li th:if="${author.branch?.name == 'HQ'}" class="nav-item">
+      <a class="nav-link collapsed" href="#"><i class="bi bi-diagram-3-fill me-2"></i> Branches</a>
+    </li><!-- End Accounts Nav -->
+
+    <li sec:authorize="hasRole('ADMIN')" class="nav-item">
+      <a class="nav-link collapsed" href="/admin/users"><i class="bi bi-shield-shaded me-2"></i> User Accounts</a>
+    </li><!-- End Accounts Nav -->
+
+    <!-- SYSTEM -->
+    <li class="nav-heading">System</li>
+    <li class="nav-item">
+      <a class="nav-link collapsed" th:href="@{/settings}">
+        <i class="bi bi-gear"></i>
+        <span>Settings</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="#" data-bs-toggle="modal" data-bs-target="#logout">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Log Out</span>
+      </a>
+    </li>
+  </ul>
+
+</aside><!-- End Sidebar-->

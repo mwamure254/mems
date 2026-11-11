@@ -1,13 +1,18 @@
 package com.mfano.mems.auth.models;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -26,17 +31,27 @@ public abstract class BaseObject {
     private LocalDateTime updatedAt;
 
     private String createdBy;
+    private String updatedBy;
+
+    @Column(nullable = false)
+    private boolean active = false;
+
+    @Column(unique = true)
+    private String reference; // e.g. LN-20261016-0001
 
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
-        this.updatedAt = createdAt;
 
+        if (reference == null) {
+            this.reference = String.valueOf(ThreadLocalRandom.current().nextLong(1_000_000_000L, 9_000_000_000L));
+        }
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (createdBy == null) {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
             if (auth != null && auth.getPrincipal() instanceof CustomUserDetails userDetails) {
-                this.createdBy = userDetails.getEmail();
+                this.createdBy = userDetails.getUsername();
             } else {
                 this.createdBy = "sys";
             }
@@ -46,6 +61,14 @@ public abstract class BaseObject {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
-    }
 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (updatedBy == null) {
+            if (auth != null && auth.getPrincipal() instanceof CustomUserDetails userDetails) {
+                this.updatedBy = userDetails.getUsername();
+            } else {
+                this.updatedBy = "sys";
+            }
+        }
+    }
 }

@@ -2,9 +2,9 @@
 		class="bi bi-arrow-up-short"></i></a>
 
 <!-- ======= Footer ======= -->
-<footer class="text-center py-4 sticky-bottom">
+<footer class="text-center py-4 sticky-footer">
 	<div class="copyright">
-		Copyright &copy; <strong><span>Mfano</span></strong>. All Rights Reserved
+		Copyright &copy; <strong><span>Mfano Solutions</span></strong>. All Rights Reserved
 	</div>
 </footer>
 <!-- =====End Footer===== -->
@@ -17,7 +17,6 @@
 <script th:src="@{/vendor/quill/quill.min.js}"></script>
 <script th:src="@{/vendor/simple-datatables/simple-datatables.js}"></script>
 <script th:src="@{/vendor/tinymce/tinymce.min.js}"></script>
-<script th:src="@{/vendor/php-email-form/validate.js}"></script>
 
 <!-- Template Main JS File -->
 <script th:src="@{/js/main.js}"></script>
@@ -33,11 +32,8 @@
 					Confirm to Logout
 				</h5>
 				<div class="row my-2 justify-content-center">
-					<button class="btn col-sm-4 btn-warning mx-2" data-bs-dismiss="modal">Cancel</button>
-
-					<form class="col-sm-4 btn-success mx-2" th:action="@{/logout}" method="post">
-						<button class="btn btn-success" type="submit">Proceed</button>
-					</form>
+					<button class="btn btn-outline-warning col-sm-4  mx-2" data-bs-dismiss="modal">Cancel</button>
+					<a href="/logout" class="btn btn-outline-success col-sm-4 mx-2">Proceed</a>
 				</div>
 			</div>
 

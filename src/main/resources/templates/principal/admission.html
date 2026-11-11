@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:replace="~{partials/_header :: common_header(~{::title/text()},~{::link},~{::meta})}">
+    <!-- Custom meta data for this template-->
+    <meta name="description" content="mems announcements page">
+    <meta name="author" content="mfano">
+    <!-- Custom title for this page-->
+    <title>MEMS | Announcements</title>
+    <!-- Custom styles for this page-->
+</th:block>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <th:block th:insert="~{partials/_topbar}" />
+    <!-- =====End Header===== -->
+
+    <!-- ======= Sidebar ======= -->
+    <th:block th:insert="~{partials/_sidebar}" />
+    <!-- =====End Sidebar=====-->
+
+    <main id="main" class="main dashboard d-flex flex-column min-vh-100">
+
+        <!-- Page Heading -->
+        <div class="pagetitle d-sm-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 class="fw-bold mb-1">
+                    <i class="bi bi-megaphone"></i>
+                    Students
+                </h1>
+
+                <p class="text-muted mb-0">
+                    All learners in the school
+                </p>
+            </div>
+
+            <!-- Breadcrumb -->
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/}">
+                            <i class="bi bi-house-door me-1"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/}">Students</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Admission</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+
+        <div class="card borde-0">
+            <!-- Card Header -->
+            <div class="card-header py-3">
+                <div class="d-flex flex-column flex-md-row align-items-md-start justify-content-between">
+
+                    <!-- SEARCH -->
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+
+                            <input type="text" id="tableSearch" class="form-control"
+                                placeholder="Search announcement...">
+                        </div>
+                    </div>
+                    <div class="mt-3 mt-md-0 d-flex flex-wrap">
+                        <!-- Export -->
+                        <div class="btn-group mr-2 mb-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                data-bs-toggle="dropdown">
+                                <i class="bi bi-download bi-sm m-1"></i>Export
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right shadow">
+                                <h6 class="dropdown-header">Export Records</h6>
+                                <a class="dropdown-item"
+                                    th:href="@{/records/documents/export/excel(filter=${filter})}"><i
+                                        class="bi bi-file-excel bi-sm bi-fw mr-2 text-success"></i>Excel</a>
+                                <a class="dropdown-item" th:href="@{/records/documents/export/pdf(filter=${filter})}"><i
+                                        class="bi bi-file-pdf bi-sm bi-fw mr-2 text-danger"></i>PDF</a>
+                                <a class="dropdown-item"
+                                    th:href="@{/records/documents/export/word(filter=${filter})}"><i
+                                        class="bi bi-file-word bi-sm bi-fw mr-2 text-primary"></i>WORD</a>
+                            </div>
+                        </div>
+
+                        <!-- Filter -->
+                        <div class="btn-group mr-2 mb-2 px-2">
+                            <button type="button" class="btn btn-sm btn-outline-warning dropdown-toggle"
+                                data-bs-toggle="dropdown">
+                                <i class="bi bi-filter bi-sm m-1"></i>Filter
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right shadow">
+                                <h6 class="dropdown-header">Filter By Grade</h6>
+                                <a class="dropdown-item" th:href="@{/announcements/filter(filter=${a.name})}"
+                                    th:each="g : ${grades}" th:value="${g.id}" th:text="${g.name}">Grade</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" th:href="@{/announcements}">All Entries</a>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-outline-primary mr-2 mb-2" data-bs-toggle="modal"
+                            data-bs-target="#studentModal">
+                            <i class="bi bi-plus"></i> Admit student
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STUDENTS TABLE -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>ADM NUMBER</th>
+                                    <th>NAME</th>
+                                    <th>GENDER</th>
+                                    <th>GRADE</th>
+                                    <th>GUARDIAN</th>
+                                    <th>PHONE</th>
+                                    <th>STATUS</th>
+                                    <th class="text-end">ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="s, stat : ${students}">
+                                    <td th:text="${stat.index}">#</td>
+                                    <td th:text="${s.admissionNumber}">001</td>
+                                    <td th:text="${s.firstName + ' ' + s.lastName}">BRIAN MRAMBA</td>
+                                    <td th:text="${s.gender}">Male</td>
+                                    <td th:text="${s.grade?.name}">Grade 2 RED</td>
+                                    <td th:text="${s.parentName}">SHIDA MRAMBA</td>
+                                    <td th:text="${s.parentPhone}">0711554411</td>
+                                    <td class="text-end">
+                                        <span th:if="${s.status == 'ACTIVE'}" class="badge rounded-pill text-white"
+                                            style="background:#00a67e;">Active</span>
+                                        <span th:if="${s.status == 'TRANSFERRED'}"
+                                            class="badge rounded-pill bg-light text-dark">Transferred</span>
+                                        <span th:if="${s.status == 'DECEASED'}"
+                                            class="badge rounded-pill bg-light text-warning">Deceased</span>
+                                        <span th:if="${s.status == 'SUSPENDED'}"
+                                            class="badge rounded-pill bg-light text-primary">Suspended</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="#" class="text-muted me-2" data-bs-toggle="modal"
+                                            data-bs-target="#studentModal"
+                                            th:attr="data-id=${s.id}, data-adm=${s.admNo}, data-name=${s.name}, data-gender=${s.gender}, 
+                                            data-grade=${s.className}, data-guardian=${s.guardian}, data-phone=${s.phone}">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </a>
+                                        <a th:href="@{/students/delete/{id}(id=${s.id})}" class="text-danger"
+                                            onclick="return confirm('Delete this student?')">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+
+                                <!-- EMPTY -->
+                                <tr th:if="${#lists.isEmpty(announcements)}">
+                                    <td colspan="9" class="text-center py-5">
+                                        <i class="bi bi-megaphone fs-1 text-muted"></i>
+                                        <h5 class="mt-3">
+                                            No students admitted yet
+                                        </h5>
+                                        <p class="text-muted">
+                                            Add your first learner to get started.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Footer -->
+            <div class="card-footer bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Records are maintained for security and accountability.
+                    </small>
+                    <span class="badge bg-secondary" th:if="${students != null}"
+                        th:text="${#lists.size(students) + ' Entries'}">0 Entries</span>
+                </div>
+            </div>
+        </div>
+    </main><!-- End #main -->
+
+    <!-- ADD/EDIT STUDENT MODAL -->
+    <div class="modal fade" id="studentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form th:action="@{/students/save}" method="post">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold">Add student</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="branch" id="branch" th:value="${author.branch?.id}">
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Adm Number *</label>
+                                <input type="text" name="admmissionNumber" id="stuAdm" class="form-control" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Grade *</label>
+                                <select name="className" id="stuGrade" class="form-select" required>
+                                    <option value="">Select</option>
+                                    <option th:each="g : ${grades}" th:value="${g}" th:text="${g}">Grade 1 RED</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Gender *</label>
+                                <select name="gender" id="stuGender" class="form-select" required>
+                                    <option value="">Select</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">First Name *</label>
+                                <input type="text" name="firstName" id="fin" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Last Name *</label>
+                                <input type="text" name="lastName" id="lan" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label">Other Name *</label>
+                                <input type="text" name="otherName" id="otherName" class="form-control" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Stream </label>
+                                <input type="text" name="stream" id="stuStream" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Guardian *</label>
+                                <input type="text" name="parentName" id="stuGuardian" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phone *</label>
+                                <input type="text" name="parentPhone" id="stuPhone" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="reset" class="btn btn-warning">Clear</button>
+                        <button type="submit" class="btn btn-success">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- =====footer===== -->
+    <th:block th:insert="~{partials/_footer}" />
+</body>
+
+</html>

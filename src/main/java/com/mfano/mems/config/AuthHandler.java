@@ -44,9 +44,9 @@ public class AuthHandler implements AuthenticationSuccessHandler,
         // log activity info
         if (authentication != null &&
                 authentication.getPrincipal() instanceof CustomUserDetails user) {
-            auditService.record(
+            auditService.record(user.getBranch().getId(),
                     "USER_LOGIN", "SUCCESS",
-                    "User " + user.getEmail() + " Logged In.");
+                    "User " + user.getUsername() + " Logged In.");
             response.sendRedirect("/");
             return;
         }
@@ -68,7 +68,7 @@ public class AuthHandler implements AuthenticationSuccessHandler,
             email = "UNKNOWN";
         }
 
-        auditService.record(
+        auditService.record(null,
                 "USER_LOGIN", "FAIL",
                 "User " + email + " Failed to Login.");
 
@@ -104,9 +104,9 @@ public class AuthHandler implements AuthenticationSuccessHandler,
         if (authentication != null &&
                 authentication.getPrincipal() instanceof CustomUserDetails user) {
 
-            auditService.record(
+            auditService.record(user.getBranch().getId(),
                     "USER_LOGOUT", "SUCCESS",
-                    "User " + user.getEmail() + " Logged Out.");
+                    "User " + user.getUsername() + " Logged Out.");
         }
     }
 }

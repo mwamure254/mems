@@ -45,7 +45,7 @@ document.getElementById("tableSearch")
 
     });
 
-    // POS PRODUCT SEARCH
+// POS PRODUCT SEARCH
 document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('tableSearch');
     const products = document.querySelectorAll('.product-item');
@@ -71,3 +71,20 @@ document.addEventListener('DOMContentLoaded', function () {
         noResults.style.display = visibleCount === 0 ? 'block' : 'none';
     });
 });
+
+//Format to SenteceCase
+function formatSentenceCase(input) {
+    let value = input.value.toLowerCase();
+
+    // Capitalize the first letter of the text
+    value = value.replace(/^\s*[a-z]/, function (match) {
+        return match.toUpperCase();
+    });
+
+    // Capitalize the first letter after . ! or ?
+    value = value.replace(/([.!?]\s+)([a-z])/g, function (match, punctuation, letter) {
+        return punctuation + letter.toUpperCase();
+    });
+
+    input.value = value;
+}

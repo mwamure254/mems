@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:replace="~{partials/_header :: common_header(~{::title/text()},~{::link},~{::meta})}">
+    <!-- Custom meta data for this template-->
+    <meta name="description" content="mems announcements page">
+    <meta name="author" content="mfano">
+    <!-- Custom title for this page-->
+    <title>MEMS | Announcements</title>
+    <!-- Custom styles for this page-->
+</th:block>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <th:block th:insert="~{partials/_topbar}" />
+    <!-- =====End Header===== -->
+
+    <!-- ======= Sidebar ======= -->
+    <th:block th:insert="~{partials/_sidebar}" />
+    <!-- =====End Sidebar=====-->
+
+    <main id="main" class="main">
+
+        <!-- Page Heading -->
+        <div class="pagetitle d-sm-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 class="fw-bold mb-1">
+                    <i class="bi bi-megaphone"></i>
+                    Announcements
+                </h1>
+
+                <p class="text-muted mb-0">
+                    Notices for the school community
+                </p>
+            </div>
+
+            <!-- Breadcrumb -->
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/}">
+                            <i class="bi bi-house-door me-1"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/}">User</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Announcements</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+
+        <div class="card borde-0">
+            <!-- Card Header -->
+            <div class="card-header py-3">
+                <div class="d-flex flex-column flex-md-row align-items-md-start justify-content-between">
+
+                    <!-- SEARCH -->
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+
+                            <input type="text" id="tableSearch" class="form-control"
+                                placeholder="Search announcement...">
+                        </div>
+                    </div>
+                    <div class="mt-3 mt-md-0 d-flex flex-wrap">
+                        <!-- Export -->
+                        <div class="btn-group mr-2 mb-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                data-bs-toggle="dropdown">
+                                <i class="bi bi-download bi-sm m-1"></i>Export
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right shadow">
+                                <h6 class="dropdown-header">Export Records</h6>
+                                <a class="dropdown-item"
+                                    th:href="@{/records/documents/export/excel(filter=${filter})}"><i
+                                        class="bi bi-file-excel bi-sm bi-fw mr-2 text-success"></i>Excel</a>
+                                <a class="dropdown-item" th:href="@{/records/documents/export/pdf(filter=${filter})}"><i
+                                        class="bi bi-file-pdf bi-sm bi-fw mr-2 text-danger"></i>PDF</a>
+                                <a class="dropdown-item"
+                                    th:href="@{/records/documents/export/word(filter=${filter})}"><i
+                                        class="bi bi-file-word bi-sm bi-fw mr-2 text-primary"></i>WORD</a>
+                            </div>
+                        </div>
+
+                        <!-- Filter -->
+                        <div class="btn-group mr-2 mb-2 px-2">
+                            <button type="button" class="btn btn-sm btn-outline-warning dropdown-toggle"
+                                data-bs-toggle="dropdown">
+                                <i class="bi bi-filter bi-sm m-1"></i>Filter
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right shadow">
+                                <h6 class="dropdown-header">Filter By Audience</h6>
+                                <a class="dropdown-item" th:href="@{/announcements/filter(filter=${a.name})}"
+                                    th:each="a : ${roles}" th:value="${a.name}" th:text="${a.name}">User</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" th:href="@{/announcements}">All Entries</a>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-outline-primary mr-2 mb-2" data-bs-toggle="modal"
+                            data-bs-target="#announcementModal">
+                            <i class="bi bi-plus"></i> New announcement
+
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- USERS TABLE -->
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="table">
+                    <thead class="table-light">
+                        <tr>
+                            <th>DATE</th>
+                            <th>TITLE</th>
+                            <th>AUDIENCE</th>
+                            <th>MESSAGE</th>
+                            <th class="text-end">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="a : ${announcements}">
+                            <td th:text="${#temporals.format(a.createdAt, 'dd MMM yyyy')}">29 Oct 2026</td>
+                            <td class="fw-semibold" th:text="${a.name}">SCHOOL FEES</td>
+                            <td th:text="${audience[a.id]?.name == 'USER' ? 'ALL' : audience[a.id]?.name}">Parents</td>
+                            <td th:text="${a.description}">Kindly pay school fees</td>
+                            <td class="text-end">
+                                <a href="#" class="text-muted me-2" data-bs-toggle="modal"
+                                    data-bs-target="#announcementModal"
+                                    th:attr="data-id=${a.id}, data-title=${a.name}, ata-audience=${a.audience}, data-message=${a.description}">
+                                    <i class="bi bi-pen"></i>
+                                </a>
+                                <a th:href="@{/announcements/delete/{id}(id=${a.id})}" class="text-danger"
+                                    onclick="return confirm('Delete this announcement?')">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <!-- EMPTY -->
+                        <tr th:if="${#lists.isEmpty(announcements)}">
+                            <td colspan="7" class="text-center py-5">
+                                <i class="bi bi-megaphone fs-1 text-muted"></i>
+                                <h5 class="mt-3">
+                                    No announcements for now
+                                </h5>
+                                <p class="text-muted">
+                                    Publish your first announcement to get started.
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Card Footer -->
+            <div class="card-footer bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Records are maintained for security and accountability.
+                    </small>
+                    <span class="badge bg-secondary" th:if="${announcements != null}"
+                        th:text="${#lists.size(announcements) + ' Entries'}">0 Entries</span>
+                </div>
+            </div>
+        </div>
+    </main><!-- End #main -->
+
+    <!-- NEW/EDIT ANNOUNCEMENT MODAL -->
+    <div class="modal fade" id="announcementModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form th:action="@{/announcements/save}" method="post" enctype="multipart/form-data" accept="application/pdf">
+                <div class="modal-content">
+                    <!-- HEADER -->
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold">New announcement</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <!-- BODY -->
+                    <div class="modal-body">
+                        <input type="hidden" name="branch" id="annBranch" th:value="${author.branch?.id}">
+
+                        <div class="row">
+                            <!-- TITLE -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Title *</label>
+                                <input type="text" name="name" id="annTitle" class="form-control" required>
+                            </div>
+
+                            <!-- AUDIENCE -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Audience *</label>
+                                <select name="audience" id="annAudience" class="form-select" required>
+                                    <option value="">SELECT</option>
+                                    <option th:each="r : ${roles}" th:value="${r.id}"
+                                        th:text="${r.name == 'USER' ? 'ALL' : r.name}" required>
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- MESSAGE -->
+                        <div class="mb-3">
+                            <label class="form-label">Message *</label>
+                            <textarea name="description" id="annMessage" class="form-control" rows="4"
+                                required></textarea>
+                        </div>
+
+                        <!-- FILE -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Select attachement
+                            </label>
+                            <input name="file" type="file" class="form-control">
+                        </div>
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-warning">Clear</button>
+                        <button type="submit" class="btn btn-success">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- =====footer===== -->
+    <th:block th:insert="~{partials/_footer}" />
+</body>
+
+</html>

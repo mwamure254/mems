@@ -2,7 +2,6 @@ package com.mfano.mems.auth.services;
 
 import java.util.List;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import com.mfano.mems.auth.models.AuditEntry;
@@ -15,8 +14,9 @@ import lombok.RequiredArgsConstructor;
 public class AuditService {
      private final AuditRepository repo;
 
-    public void record(String action, String status, String details) {
+    public void record(Long b, String action, String status, String details) {
         AuditEntry entry = new AuditEntry();
+        entry.setBranch(b);
         entry.setAction(action);
         entry.setStatus(status);
         entry.setDetails(details);

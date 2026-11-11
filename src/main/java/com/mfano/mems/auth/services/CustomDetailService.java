@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import com.mfano.mems.config.CustomUserDetails;
 import com.mfano.mems.auth.models.User;
-import com.mfano.mems.auth.services.UserService;
 
 import lombok.RequiredArgsConstructor;
 

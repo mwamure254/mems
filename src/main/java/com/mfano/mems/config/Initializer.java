@@ -46,7 +46,8 @@ public class Initializer implements CommandLineRunner {
                 "PRINCIPAL",
                 "TEACHER",
                 "LIBRARY",
-                "BURSAR");
+                "BURSAR",
+                "USER");
 
         for (String roleName : defaultRoles) {
 
@@ -96,9 +97,12 @@ public class Initializer implements CommandLineRunner {
 
             admin.setEmail(adminEmail);
             admin.setPassword(passwordEncoder.encode(adminPassword));
-            admin.setEnabled(true);
+            admin.setActive(true);
             admin.setBranch(hqBranch);
-            admin.setCreatedBy("sys");
+            admin.setFin("sys");
+            admin.setLan("sys");
+            admin.setGender("sys");
+            admin.setDesignation("System Admin");
             admin.setRoles(Set.of(adminRole));
 
             userRepository.save(admin);

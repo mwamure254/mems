@@ -14,18 +14,18 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.mfano.mems.auth.models.Profile;
 import com.mfano.mems.auth.repositories.ProfileRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor 
 public class ProfileService {
     private final ProfileRepository profileRepository;
     private Profile profile, existing;
+    private final AuditService auditService;
 
     @Value("${app.upload-dir}")
     private String baseDirectory;
     // private String baseDirectory = "src/main/resources/static/image/profile/";
-
-    public ProfileService(ProfileRepository profileRepository) {
-        this.profileRepository = profileRepository;
-    }
 
     // Get All Profiles
     public List<Profile> findAll() {
@@ -53,9 +53,10 @@ public class ProfileService {
     }
 
     // Update Profile
-    public void update(Long userid, Profile profile) {
+    public void update(Long userid, Profile profile, RedirectAttributes red, Long branch) {
         existing = findByUser(userid);
 
+        if(existing != null){
         // update only editable fields
         existing.setFin(profile.getFin());
         existing.setLan(profile.getLan());
@@ -74,20 +75,21 @@ public class ProfileService {
 
         save(existing);
 
+        auditService.record(branch, "update_profile", "SUCCESS", "Updated profile.");
+        red.addAttribute("message", "Profile updated successfully");
+        }
+        else {
+
+        red.addAttribute("error", "No user account found.");
+        }
+
     }
 
     // Update Profile Image
-    public void updateProfileImage(Long userid, MultipartFile file, RedirectAttributes red) throws IOException {
+    public void updateProfileImage(Long userid, String file, RedirectAttributes red) throws IOException {
         existing = findByUser(userid);
         try {
-            Path path = Paths.get(baseDirectory, "profiles", file.getOriginalFilename())
-                    .toAbsolutePath()
-                    .normalize();
-            Files.createDirectories(path.getParent());
-            Files.write(path, file.getBytes());
-
-            String img = file.getOriginalFilename();
-            existing.setImage(img);
+            existing.setImage(file);
             save(existing);
             red.addFlashAttribute("message", "Profile image updated successsfully");
         } catch (Exception e) {
@@ -121,7 +123,6 @@ public class ProfileService {
             profile = new Profile();
             profile.setUser(userid);
             save(profile);
-
         }
         return profile;
     }

@@ -20,100 +20,109 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.mfano.mems.auth.services.CustomDetailService;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor 
 public class SecurityConfig implements WebMvcConfigurer {
-    private final CustomDetailService customDetailService;
-    private final PasswordEncoder passwordEncoder;
+        private final CustomDetailService customDetailService;
+        private final PasswordEncoder passwordEncoder;
 
-    public SecurityConfig(CustomDetailService customDetailService, PasswordEncoder passwordEncoder) {
-        this.customDetailService = customDetailService;
-        this.passwordEncoder = passwordEncoder;
-    }
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http, AuthHandler authHandler) throws Exception {
+                http.csrf(csrf -> csrf.disable());
+                http.authorizeHttpRequests(auth -> auth
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, AuthHandler authHandler) throws Exception {
-        http.csrf(csrf -> csrf.disable());
-        http.authorizeHttpRequests(auth -> auth
+                                // Public pages
 
-                .requestMatchers("/**/dashboard").authenticated()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/principal/**").hasRole("PRINCIPAL")
-                .requestMatchers("/teacher/**").hasRole("TEACHER")
-                .requestMatchers("/bursar/**").hasRole("BURSAR")
-                .requestMatchers("/library/**").hasRole("LIBRARY")
-                .requestMatchers("/", "/register", "/login", "/verify", "/forgot", "/reset-password",
-                        "/resend", "/error/403", "/profile", "/css/**", "/js/**", "/vendor/**",
-                        "/image/**")
-                .permitAll()
-                .anyRequest().authenticated())
+                                .requestMatchers("/", "/register", "/login", "/verify", "/forgot",
+                                                "/reset-password",
+                                                "/resend", "/error/403", "/profile", "/css/**",
+                                                "/js/**", "/vendor/**", "/business/**",
+                                                "/image/**")
+                                .permitAll()
 
-                .formLogin(form -> form
-                        .loginPage("/login") //or custom landing page
-                        .loginProcessingUrl("/login") //if custom landing page
-                        .successHandler(authHandler)
-                        .failureHandler(authHandler)
-                        .permitAll())
+                                // Protected pages
+                                .requestMatchers("/**/dashboard").authenticated()
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/principal/**").hasRole("PRINCIPAL")
+                                .requestMatchers("/teacher/**").hasRole("TEACHER")
+                                .requestMatchers("/bursar/**").hasRole("BURSAR")
+                                .requestMatchers("/library/**").hasRole("LIBRARY")
+                                .anyRequest().authenticated())
 
-                .exceptionHandling(handling -> handling
-                        .accessDeniedPage("/error/403"))
+                                .formLogin(form -> form
+                                                .loginPage("/login") // or custom landing page
+                                                .loginProcessingUrl("/login") // if custom landing page
+                                                .successHandler(authHandler)
+                                                .failureHandler(authHandler)
+                                                .permitAll())
 
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .addLogoutHandler(authHandler)
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true)
-                        .deleteCookies("JSESSIONID")
-                        .logoutSuccessUrl("/login?logout")
-                        .permitAll())
+                                .exceptionHandling(handling -> handling
+                                                .accessDeniedPage("/error/403"))
 
-                .sessionManagement(management -> management
-                        .maximumSessions(1)
+                                .logout(logout -> logout
+                                                .logoutUrl("/logout")
+                                                .addLogoutHandler(authHandler)
+                                                .invalidateHttpSession(true)
+                                                .clearAuthentication(true)
+                                                .deleteCookies("JSESSIONID")
+                                                .logoutSuccessUrl("/login?logout")
+                                                .permitAll())
 
-                        .expiredUrl("/login?expired=true"));
+                                .sessionManagement(management -> management
+                                                .maximumSessions(1)
 
-        return http.build();
-    }
+                                                .expiredUrl("/login?expired=true"));
 
-    // =====================================================
-    // AUTHENTICATION PROVIDER
-    // =====================================================
-    @Bean
-    AuthenticationProvider authenticationProvider() {
+                return http.build();
+        }
 
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(customDetailService);
+        // =====================================================
+        // AUTHENTICATION PROVIDER
+        // =====================================================
+        @Bean
+        AuthenticationProvider authenticationProvider() {
 
-        provider.setPasswordEncoder(passwordEncoder);
-        return provider;
-    }
+                DaoAuthenticationProvider provider = new DaoAuthenticationProvider(customDetailService);
 
-    // =====================================================
-    // AUTHENTICATION MANAGER
-    // =====================================================
-    @Bean
-    AuthenticationManager authenticationManager(
-            AuthenticationConfiguration configuration)
-            throws Exception {
+                provider.setPasswordEncoder(passwordEncoder);
+                return provider;
+        }
 
-        return configuration.getAuthenticationManager();
-    }
+        // =====================================================
+        // AUTHENTICATION MANAGER
+        // =====================================================
+        @Bean
+        AuthenticationManager authenticationManager(
+                        AuthenticationConfiguration configuration)
+                        throws Exception {
 
-    // IMAGE ROUTE
-    @Value("${app.upload-dir}")
-    private String uploadDir;
+                return configuration.getAuthenticationManager();
+        }
 
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // IMAGE ROUTE
+        @Value("${app.upload-dir}")
+        private String uploadDir;
 
-        Path profilePath = Paths.get(uploadDir, "passport")
-                .toAbsolutePath()
-                .normalize();
+        @Override
+        public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
-        Path documentPath = Paths.get(uploadDir, "documents")
-                .toAbsolutePath()
-                .normalize();
+                Path reportPath = Paths.get(uploadDir, "reports")
+                                .toAbsolutePath()
+                                .normalize();
 
-        registry.addResourceHandler("/passport/**", "/documents/**")
-                .addResourceLocations(profilePath.toUri().toString(), documentPath.toUri().toString());
-    }
+                Path documentPath = Paths.get(uploadDir, "documents")
+                                .toAbsolutePath()
+                                .normalize();
+
+                Path profilePath = Paths.get(uploadDir, "profiles")
+                                .toAbsolutePath()
+                                .normalize();
+
+                registry.addResourceHandler("/reports/**", "/documents/**", "/profiles/**")
+                                .addResourceLocations(reportPath.toUri().toString(), documentPath.toUri().toString(),
+                                                profilePath.toUri().toString());
+        }
 }

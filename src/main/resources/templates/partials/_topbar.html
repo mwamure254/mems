@@ -4,7 +4,7 @@
   <div class="d-flex align-items-center justify-content-between">
     <a href="/" class="logo d-flex align-items-center">
       <img th:src="@{/image/mfano.png}" alt="">
-      <span class="d-none d-lg-block">M-POS</span>
+      <span class="d-none d-lg-block">M-EMS</span>
     </a>
   </div><!-- End Logo -->
 
@@ -178,16 +178,16 @@
 
         <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
 
-          <img th:src="${#strings.isEmpty(profile.image) || profile.image == null || profile.image == ''
+          <img th:src="${author.image == null or author.image.isEmpty() or '/profiles/' + author.image == null or author.image == ''
         ? '/image/profile-img.jpg'
-        : '/profiles/' + profile.image}" alt="MY" class="rounded-circle" height="38" width="38">
+        : '/profiles/' + author.image}" alt="MY" class="rounded-circle" height="38" width="38">
 
         </a>
 
         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
           <li class="dropdown-header">
             <h6 th:text="${author.fin + ' ' + author.lan}">First Last</h6>
-            <span th:text="${profile.designation}">Your Designation</span>
+            <span th:text="${author.designation}">Your Designation</span>
 
           </li>
           <li>

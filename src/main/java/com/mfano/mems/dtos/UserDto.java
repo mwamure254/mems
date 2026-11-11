@@ -1,10 +1,8 @@
 package com.mfano.mems.dtos;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.mfano.mems.auth.models.Role;
-
+import jakarta.mail.Multipart;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -21,11 +19,11 @@ public class UserDto {
   @Email 
   @NotBlank 
   private String email;
-  @NotBlank
   private String password;
   private String fin;
   private String lan;
   private String gender;
+  private String image;
   @NotNull 
   private Long branch;
   @NotNull 

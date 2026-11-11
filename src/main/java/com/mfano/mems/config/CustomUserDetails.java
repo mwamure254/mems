@@ -1,7 +1,6 @@
 package com.mfano.mems.config;
 
 import java.util.Collection;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -16,13 +15,15 @@ import lombok.RequiredArgsConstructor;
 public class CustomUserDetails implements UserDetails {
 
     private User user;
+
     public User getUser() {
         return user;
     }
+
     public CustomUserDetails(User user) {
         this.user = user;
     }
-    
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return user.getRoles().stream()
@@ -57,24 +58,31 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.isEnabled();
+        return user.isActive();
     }
 
-    public String getEmail() {
-        return user.getEmail();
+    public Long getId() {
+        return user.getId();
     }
+
     public String getFin() {
         return user.getFin();
     }
+
     public String getLan() {
         return user.getLan();
+    }
+
+    public String getImage() {
+        return user.getImage();
+    }
+
+    public String getDesignation() {
+        return user.getDesignation();
     }
 
     public Branch getBranch() {
         return user.getBranch();
     }
 
-    public Long getId() { return user.getId(); }
-    public Set<String> getRoles() { return user.getRoles().stream().map(r->r.getName()).collect(Collectors.toSet()); }
-    
 }
