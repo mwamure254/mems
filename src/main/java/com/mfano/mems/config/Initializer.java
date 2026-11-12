@@ -55,6 +55,10 @@ public class Initializer implements CommandLineRunner {
 
                 Role role = new Role();
                 role.setName(roleName);
+                if(roleName == "ADMIN") {
+                    role.setActive(true);
+                } 
+                role.setDescription("Default role " + roleName);
                 role.setCreatedBy("sys");
 
                 roleRepo.save(role);
@@ -66,8 +70,7 @@ public class Initializer implements CommandLineRunner {
         // =========================
 
         List<String> defaultBranches = List.of(
-                "HQ",
-                "OTHER");
+                "HQ");
 
         for (String branchName : defaultBranches) {
 
@@ -75,6 +78,7 @@ public class Initializer implements CommandLineRunner {
 
                 Branch branch = new Branch();
                 branch.setName(branchName);
+                branch.setActive(true);
                 branch.setCreatedBy("sys");
 
                 branchRepo.save(branch);

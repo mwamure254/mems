@@ -24,53 +24,44 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-// PRODUCT SEARCH
-document.getElementById("tableSearch")
-    .addEventListener("keyup", function () {
+//SEARCH FUNCTION
+function searchTable(searchId, tableId) {
+    const input = document.getElementById(searchId);
+    const table = document.getElementById(tableId);
 
+    input.addEventListener("keyup", function () {
         let search = this.value.toLowerCase();
-
-        document
-            .querySelectorAll("#table tbody tr")
-            .forEach(function (row) {
-
-                let text = row.innerText.toLowerCase();
-
-                row.style.display =
-                    text.includes(search)
-                        ? ""
-                        : "none";
-
-            });
-
-    });
-
-// POS PRODUCT SEARCH
-document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.getElementById('tableSearch');
-    const products = document.querySelectorAll('.product-item');
-    const noResults = document.getElementById('noProductsFound');
-
-    searchInput.addEventListener('input', function () {
-        const query = this.value.trim().toLowerCase();
+        let rows = table.querySelectorAll("tbody tr");
         let visibleCount = 0;
 
-        products.forEach(function (product) {
-            const name = (product.dataset.name || '').toLowerCase();
-            const sku = (product.dataset.sku || '').toLowerCase();
+        rows.forEach(function (row) {
+            // skip the "no results" row itself
+            if (row.classList.contains("no-results")) return;
 
-            const matches = name.includes(query) || sku.includes(query);
-
-            product.style.display = matches ? '' : 'none';
-
-            if (matches) {
-                visibleCount++;
-            }
+            let text = row.innerText.toLowerCase();
+            let match = text.includes(search);
+            
+            row.style.display = match ? "" : "none";
+            if (match) visibleCount++;
         });
 
-        noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        // Handle "No results" row
+        let noResultRow = table.querySelector(".no-results");
+        if (!noResultRow) {
+            // create it if it doesn't exist
+            noResultRow = document.createElement("tr");
+            noResultRow.classList.add("no-results");
+            let td = document.createElement("td");
+            td.colSpan = rows[0] ? rows[0].children.length : 3; // auto set columns
+            td.classList.add("text-center", "text-muted", "fw-bold", "py-3");
+            td.innerText = "No results found";
+            noResultRow.appendChild(td);
+            table.querySelector("tbody").appendChild(noResultRow);
+        }
+        
+        noResultRow.style.display = visibleCount === 0 ? "" : "none";
     });
-});
+}
 
 //Format to SenteceCase
 function formatSentenceCase(input) {

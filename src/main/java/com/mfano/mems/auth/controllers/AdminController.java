@@ -19,13 +19,17 @@ import com.mfano.mems.config.CustomUserDetails;
 import com.mfano.mems.dtos.UserDto;
 import com.mfano.mems.utils.documents.FileUpload;
 import com.mfano.mems.auth.services.BranchService;
+import com.mfano.mems.auth.services.GradeService;
 import com.mfano.mems.auth.services.ProfileService;
 import com.mfano.mems.auth.models.Branch;
+import com.mfano.mems.auth.models.Grade;
 import com.mfano.mems.auth.models.Profile;
 import com.mfano.mems.auth.models.Role;
+import com.mfano.mems.auth.models.Term;
 import com.mfano.mems.auth.models.User;
 import com.mfano.mems.auth.services.AuditService;
 import com.mfano.mems.auth.services.RoleService;
+import com.mfano.mems.auth.services.TermService;
 import com.mfano.mems.auth.services.UserService;
 
 import jakarta.validation.Valid;
@@ -42,6 +46,8 @@ public class AdminController {
     private final BranchService storeService;
     private final ProfileService profileService;
     private final FileUpload fileUpload;
+    private final GradeService gradeService;
+    private final TermService termService;
 
     // manage /GET/* module
     @GetMapping("/{option}")
@@ -75,12 +81,6 @@ public class AdminController {
                 dir = "admin/users";
                 break;
 
-            case "branches":
-                red.addAttribute("branches", storeService.findAll());
-                red.addAttribute("branch", new Branch());
-                dir = "admin/branches";
-                break;
-
             case "roles":
                 red.addAttribute("roles", roleService.findAll());
                 red.addAttribute("stores", storeService.findAll());
@@ -90,6 +90,17 @@ public class AdminController {
             case "audits":
                 red.addAttribute("auditEntries", auditService.findAll());
                 dir = "admin/audits";
+                break;
+
+            case "administration":
+                red.addAttribute("branches", storeService.findAll());
+                red.addAttribute("grades", gradeService.findAll());
+                red.addAttribute("terms", termService.findAll());
+                red.addAttribute("roles", roleService.findAll());
+                red.addAttribute("branch", new Branch());
+                red.addAttribute("grade", new Grade());
+                red.addAttribute("term", new Term());
+                dir = "security/administration";
                 break;
         }
 
@@ -103,9 +114,10 @@ public class AdminController {
         try {
             storeService.createBranch(branch, auth.getBranch().getId(), redirectAttributes);
         } catch (Exception e) {
-            redirectAttributes.addAttribute("error", e.getMessage());
+            e.printStackTrace();
+            redirectAttributes.addAttribute("error", "Operation not successful.");
         }
-        return "redirect:/admin/branches";
+        return "redirect:/admin/administration";
     }
 
     @PostMapping("/branches/update/{id}")
@@ -116,7 +128,8 @@ public class AdminController {
         try {
             storeService.updateBranch(auth.getBranch().getId(), id, branch, redirectAttributes);
         } catch (Exception e) {
-            redirectAttributes.addAttribute("error", e.getMessage());
+            e.printStackTrace();
+            redirectAttributes.addAttribute("error", "Operation not successful.");
         }
         return "redirect:/admin/branches";
     }
@@ -128,9 +141,10 @@ public class AdminController {
         try {
             storeService.toggleActive(id, redirectAttributes);
         } catch (Exception e) {
-            redirectAttributes.addAttribute("error", e.getMessage());
+            e.printStackTrace();
+            redirectAttributes.addAttribute("error", "Operation not successful.");
         }
-        return "redirect:/admin/branches";
+        return "redirect:/admin/administration";
     }
 
     @PostMapping("/branches/delete/{id}")
@@ -140,9 +154,10 @@ public class AdminController {
         try {
             storeService.deleteBranch(auth.getBranch().getId(), id, redirectAttributes);
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "Operation not successful.");
         }
-        return "redirect:/admin/branches";
+        return "redirect:/admin/administration";
     }
 
     // Role saving
@@ -152,7 +167,8 @@ public class AdminController {
         try {
             roleService.save(role, red, auth.getBranch().getId());
         } catch (Exception e) {
-            red.addAttribute("error", e.getMessage());
+            e.printStackTrace();
+            red.addAttribute("error", "Operation not successful.");
         }
         return "redirect:/admin/roles";
     }
@@ -167,7 +183,8 @@ public class AdminController {
             roleService.update(id, role, redirectAttributes, auth.getBranch().getId());
 
         } catch (Exception e) {
-            redirectAttributes.addAttribute("error", e.getMessage());
+            e.printStackTrace();
+            redirectAttributes.addAttribute("error", "Operation not successful.");
         }
 
         return "redirect:/admin/roles";
@@ -185,6 +202,7 @@ public class AdminController {
                 try {
                     roleService.delete(id, redirectAttributes, auth.getBranch().getId());
                 } catch (Exception e) {
+                    e.printStackTrace();
                     redirectAttributes.addAttribute("error", "Operation not allowed");
                 }
                 dir = "redirect:/admin/roles";
@@ -194,6 +212,7 @@ public class AdminController {
                 try {
                     roleService.toggleActive(id, redirectAttributes, auth.getBranch().getId());
                 } catch (Exception e) {
+                    e.printStackTrace();
                     redirectAttributes.addAttribute("error", "Operation not allowed");
                 }
                 dir = "redirect:/admin/roles";
@@ -213,7 +232,8 @@ public class AdminController {
             }
             userService.registerUser(userDto, red);
         } catch (Exception e) {
-            red.addAttribute("error", e.getMessage());
+            e.printStackTrace();
+            red.addAttribute("error", "Operation not successful.");
         }
         return "redirect:/admin/users";
     }
@@ -230,7 +250,8 @@ public class AdminController {
             }
             userService.update(auth, id, userDto, red);
         } catch (Exception e) {
-            red.addFlashAttribute("error", "Operation not allowed.");
+            e.printStackTrace();
+            red.addFlashAttribute("error", "Operation not successful.");
         }
 
         return "redirect:/admin/users";
@@ -280,6 +301,7 @@ public class AdminController {
                 try {
                     userService.deleteById(id, red);
                 } catch (Exception e) {
+                    e.printStackTrace();
                     red.addFlashAttribute("error", "Sorry! Failed to delete user");
                 }
                 dir = "redirect:/admin/users";
@@ -290,7 +312,8 @@ public class AdminController {
                 try {
                     userService.toggleActive(id, red);
                 } catch (Exception e) {
-                    red.addFlashAttribute("error", "Sorry! Failed to toggle user");
+                    e.printStackTrace();
+                    red.addFlashAttribute("error", "Sorry! Failed to toggle user.");
                 }
                 dir = "redirect:/admin/users";
                 break;
@@ -307,7 +330,8 @@ public class AdminController {
         try {
             profileService.update(id, profile, red, auth.getBranch().getId());
         } catch (Exception e) {
-            red.addFlashAttribute("error", e.getMessage());
+            e.printStackTrace();
+            red.addFlashAttribute("error", "Operation not successful.");
         }
         return "redirect:/admin/users";
     }
@@ -326,7 +350,8 @@ public class AdminController {
             auditService.record(auth.getBranch().getId(), "update_image", "success",
                     auth.getUsername() + " Updated the profile image  of user id = " + user);
         } catch (IOException e) {
-            red.addFlashAttribute("error", e.getMessage());
+            e.printStackTrace();
+            red.addFlashAttribute("error", "Operation not successful.");
         }
 
         return "redirect:/admin/users";
@@ -343,7 +368,8 @@ public class AdminController {
             auditService.record(auth.getBranch().getId(), "delete_image", "success",
                     auth.getUsername() + " Deleted the profile image of user id = " + user);
         } catch (IOException e) {
-            red.addFlashAttribute("error", e.getMessage());
+            e.printStackTrace();
+            red.addFlashAttribute("error", "operation not successful.");
         }
 
         return "redirect:/admin/users";
@@ -360,7 +386,8 @@ public class AdminController {
                 try {
                     userService.assignRoleToUser(userId, roleId, red);
                 } catch (Exception e) {
-                    red.addFlashAttribute("error", e.getMessage());
+                    e.printStackTrace();
+                    red.addFlashAttribute("error", "Operation not successful.");
                 }
                 break;
 
@@ -368,7 +395,8 @@ public class AdminController {
                 try {
                     userService.removeRoleFromUser(userId, roleId, red);
                 } catch (Exception e) {
-                    red.addFlashAttribute("error", e.getMessage());
+                    e.printStackTrace();
+                    red.addFlashAttribute("error", "Operation not successful.");
                 }
                 break;
 

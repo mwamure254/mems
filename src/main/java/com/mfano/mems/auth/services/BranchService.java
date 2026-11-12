@@ -50,9 +50,7 @@ public class BranchService {
     public void updateBranch(Long user, Long id, Branch updatedBranch) {
         Branch existingBranch = findById(id);
         if (existingBranch != null) {
-            existingBranch.setName(updatedBranch.getName());
-            existingBranch.setLocation(updatedBranch.getLocation());
-            branchRepository.save(existingBranch);
+            branchRepository.save(updatedBranch);
             auditService.record(user, "update_branch", "SUCCESS", "Updated branch " + existingBranch.getName());
         }
     }
@@ -100,11 +98,13 @@ public class BranchService {
             branchRepository.save(existing);
 
             if (existing.isActive() == true) {
-            auditService.record(existing.getId(), "toggle_branch", "SUCCESS", "Activated branch " + existing.getName());
+                auditService.record(existing.getId(), "toggle_branch", "SUCCESS",
+                        "Activated branch " + existing.getName());
                 redirectAttributes.addFlashAttribute(
                         "message", "Branch unlocked successfully.");
             } else {
-            auditService.record(existing.getId(), "toggle_branch", "SUCCESS", "Deactivated branch " + existing.getName());
+                auditService.record(existing.getId(), "toggle_branch", "SUCCESS",
+                        "Deactivated branch " + existing.getName());
                 redirectAttributes.addFlashAttribute(
                         "message", "Branch locked successfully.");
             }

@@ -32,6 +32,10 @@
       <a class="nav-link collapsed" href="#"><i class="bi bi-clock-fill me-2"></i> Staff Attendance</a>
     </li><!-- End Staff Attendance Nav -->
 
+    <li sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL', 'TEACHER')" class="nav-item">
+      <a class="nav-link collapsed" href="#"><i class="bi bi-book-half me-2"></i> Subjects</a>
+    </li><!-- End Subjects Nav -->
+
     <li sec:authorize="hasRole('PRINCIPAL')" class="nav-item">
       <a class="nav-link collapsed" href="/students"><i class="bi bi-person-plus-fill me-2"></i> Admission</a>
     </li><!-- End Admission Nav -->
@@ -42,16 +46,7 @@
 
     <li sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL', 'TEACHER')" class="nav-item">
       <a class="nav-link collapsed" href="#"><i class="bi bi-building-fill me-2"></i> Streams</a>
-    </li><!-- End Accounts Nav -->
-
-
-    <li sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL', 'TEACHER')" class="nav-item">
-      <a class="nav-link collapsed" href="#"><i class="bi bi-book-half me-2"></i> Subjects</a>
-    </li><!-- End Subjects Nav -->
-
-    <li sec:authorize="hasAnyRole('LIBRARY', 'PRINCIPAL', 'TEACHER', 'STUDENT')" class="nav-item">
-      <a class="nav-link collapsed" href="#"><i class="bx bx-book me-2"></i> Library</a>
-    </li><!-- End Library Nav -->
+    </li><!-- End Streams Nav -->
 
     <li sec:authorize="hasAnyRole('PRINCIPAL', 'TEACHER', 'BURSAR', 'STUDENT')" class="nav-item">
       <a class="nav-link collapsed" href="#"><i class="bi bi-wallet-fill me-2"></i> Fees</a>
@@ -65,6 +60,10 @@
       <a class="nav-link collapsed" href="#"><i class="bi bi-layout-text-window me-2"></i> Report Cards</a>
     </li><!-- End Report Cards Nav -->
 
+    <li sec:authorize="hasAnyRole('LIBRARY', 'PRINCIPAL', 'TEACHER', 'STUDENT')" class="nav-item">
+      <a class="nav-link collapsed" href="#"><i class="bx bx-book me-2"></i> Library</a>
+    </li><!-- End Library Nav -->
+
     <li class="nav-item">
       <a class="nav-link collapsed" href="/announcements"><i class="bi bi-megaphone-fill me-2"></i> Announcements</a>
     </li><!-- End Report Cards Nav -->
@@ -74,7 +73,7 @@
     </li><!-- End transfers Nav -->
 
     <li th:if="${author.branch?.name == 'HQ'}" class="nav-item">
-      <a class="nav-link collapsed" href="#"><i class="bi bi-diagram-3-fill me-2"></i> Branches</a>
+      <a class="nav-link collapsed" href="/admin/administration"><i class="bi bi-diagram-3-fill me-2"></i> Administration</a>
     </li><!-- End Accounts Nav -->
 
     <li sec:authorize="hasRole('ADMIN')" class="nav-item">
