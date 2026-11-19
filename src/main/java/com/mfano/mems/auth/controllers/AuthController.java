@@ -8,7 +8,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +32,7 @@ import com.mfano.mems.auth.services.RoleService;
 import com.mfano.mems.auth.services.UserService;
 
 @Controller
-@RequiredArgsConstructor 
+@RequiredArgsConstructor
 public class AuthController {
     private final UserService userService;
     private final RoleService roleService;
@@ -45,40 +44,46 @@ public class AuthController {
     // guest user
     @GetMapping("/")
     public String redirectAfterLogin(@AuthenticationPrincipal CustomUserDetails auth, RedirectAttributes model) {
-
+        String redirect = "";
         if (auth == null) {
-            return "redirect:/login";
+            redirect = "redirect:/login";
         }
+        else {
+            // Extract roles
+            Set<String> roles = auth.getAuthorities()
+                    .stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toSet());
 
-        // Extract roles
-        Set<String> roles = auth.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toSet());
-
-        // If user is not assigned any role
-        if (roles.isEmpty()) {
-            model.addFlashAttribute("error", "Please contact the system admin for mapping.");
-            return login;
-        } else if (!auth.isEnabled()) {
-            model.addFlashAttribute("error", "Contact the system admin for account verification.");
-            return login;
+            // If user is not assigned any role
+            if (roles.isEmpty()) {
+                model.addFlashAttribute("error", "Please contact the system admin for mapping.");
+                return login;
+            } else if (!auth.isEnabled()) {
+                model.addFlashAttribute("error", "Your account is locked. Contact the system admin.");
+                redirect = login;
+            } else if (auth.getBranch() == null || auth.getBranch().isActive() == false) {
+                model.addFlashAttribute("error",
+                        "Your branch is inactive, please contact the vendor.");
+                redirect = login;
+            } else {
+                // Redirect based on role priority
+                if (roles.contains("ROLE_ADMIN")) {
+                    redirect = "redirect:/admin/dashboard";
+                } else if (roles.contains("ROLE_PRINCIPAL")) {
+                    redirect = "redirect:/principal/dashboard";
+                } else if (roles.contains("ROLE_TEACHER")) {
+                    redirect = "redirect:/teacher/dashboard";
+                } else if (roles.contains("ROLE_BURSAR")) {
+                    redirect = "redirect:/bursar/dashboard";
+                } else if (roles.contains("ROLE_LIBRARY")) {
+                    redirect = "redirect:/library/dashboard";
+                } else {
+                    redirect = "redirect:/guest/dashboard";
+                }
+            }
         }
-        // Redirect based on role priority
-        if (roles.contains("ROLE_ADMIN")) {
-            return "redirect:/admin/dashboard";
-        } else if (roles.contains("ROLE_PRINCIPAL")) {
-            return "redirect:/principal/dashboard";
-        } else if (roles.contains("ROLE_TEACHER")) {
-            return "redirect:/teacher/dashboard";
-        } else if (roles.contains("ROLE_BURSAR")) {
-            return "redirect:/bursar/dashboard";
-        } else if (roles.contains("ROLE_LIBRARY")) {
-            return "redirect:/library/dashboard";
-        } else {
-            return "redirect:/guest/dashboard";
-        }
-
+        return redirect;
     }
 
     @GetMapping("/register")
@@ -165,7 +170,7 @@ public class AuthController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/image/delete/{userid}")
     public String imageDelete(@PathVariable Long userid, RedirectAttributes red,
-         @AuthenticationPrincipal CustomUserDetails user) {
+            @AuthenticationPrincipal CustomUserDetails user) {
         try {
             profileService.deleteProfileImage(userid, red);
         } catch (IOException e) {

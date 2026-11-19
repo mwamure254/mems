@@ -19,13 +19,14 @@
       <div class="row justify-content-center">
         <div class="col-lg-4 col-md-6 align-items-center">
 
-          <div class="logo d-flex w-auto justify-content-center py-4">
+          <div class="logo d-flex w-auto py-4">
             <img th:src="@{/image/mfano.png}" alt="">
             <span class="d-none d-lg-block">Mfano-EMS</span>
           </div><!-- End Logo -->
 
           <div class="card mb-3">
 
+            <div th:if="${error}" class="alert alert-danger py-2" th:text="${error}"></div>
             <div class="card-body">
 
               <form class="row g-3 py-2 needs-validation" th:action="@{/login}" method="post">

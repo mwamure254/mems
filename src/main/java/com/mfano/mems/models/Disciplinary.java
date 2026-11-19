@@ -13,10 +13,10 @@ import lombok.Setter;
 @Setter
 @Getter
 public class Disciplinary extends CommonObject{
-    @Column(name = "student_id", insertable=false, updatable=false)
+    @Column(name = "student_id")
     private Long student;
     private String penalty;
 
-    @Column(name = "branch_id", insertable=false, updatable=false)
+    @Column(name = "branch_id")
     private Long branch;
 }

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:replace="~{partials/_header :: common_header(~{::title/text()},~{::link},~{::meta})}">
+    <!-- Custom meta data for this template-->
+    <meta name="description" content="mems subjects page">
+    <meta name="author" content="mfano">
+    <!-- Custom title for this page-->
+    <title>MEMS | Subjects</title>
+    <!-- Custom styles for this page-->
+</th:block>
+
+<body class="profile-page">
+
+    <!-- ======= Header ======= -->
+    <th:block th:insert="~{partials/_topbar}" />
+    <!-- =====End Header===== -->
+
+    <!-- ======= Sidebar ======= -->
+    <th:block th:insert="~{partials/_sidebar}" />
+    <!-- =====End Sidebar=====-->
+
+    <main id="main" class="main">
+
+        <!-- Page Heading -->
+        <div class="pagetitle d-sm-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 class="h3 mb-1">
+                    Subjects</h1>
+                <p class="mb-0 text-muted small">
+                    Review and edit school subjects.
+                </p>
+            </div>
+
+            <!-- Breadcrumb -->
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/}">
+                            <i class="bi bi-house-door me-1"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/}">Administration</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Subjects</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+
+        <div class="card border-0">
+            <!-- Card Header -->
+            <div class="card-header py-3">
+                <div class="d-flex flex-column flex-md-row align-items-md-start justify-content-between">
+
+                    <!-- SEARCH -->
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" id="subjectSearch" class="form-control"
+                                onkeyup="searchTable('subjectSearch', 'subjectTable')" placeholder="Search subjects...">
+                        </div>
+                    </div>
+                    <div class="mt-3 mt-md-0 d-flex flex-wrap">
+                        <!-- Export -->
+                        <div class="btn-group mx-2 mb-2">
+                            <button type="button" class="btn btn-sm btn-outline-warning dropdown-toggle"
+                                data-bs-toggle="dropdown">
+                                <i class="bi bi-download bi-sm m-1"></i>Export
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right shadow">
+                                <h6 class="dropdown-header">Export Records</h6>
+                                <a class="dropdown-item"
+                                    th:href="@{/subjects/export/excel(filter=${filter})}"><i
+                                        class="bi bi-file-excel fa-sm fa-fw mr-2 text-success"></i>Excel</a>
+                                <a class="dropdown-item" th:href="@{/subjects/export/pdf(filter=${filter})}"><i
+                                        class="bi bi-file-pdf fa-sm fa-fw mr-2 text-danger"></i>PDF</a>
+                                <a class="dropdown-item"
+                                    th:href="@{/subjects/export/word(filter=${filter})}"><i
+                                        class="bi bi-file-word fa-sm fa-fw mr-2 text-primary"></i>WORD</a>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-outline-primary mr-2 mb-2" data-bs-toggle="modal"
+                            data-bs-target="#addSubject">
+                            <i class="bi bi-plus-lg"></i>
+                            Add Subject
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUBJECTS' TABLE -->
+            <div class="table-responsive p-2">
+                <table class="table table-hover mb-0" id="subjectTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>SUBJECT</th>
+                            <th>CODE</th>
+                            <th>UIN</th>
+                            <th>STATUS</th>
+                            <th class="text-end">ACTION</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="s, stat : ${subjects}">
+                            <td th:text="${stat.count}" th:id="'s-' + ${s.id}">#</td>
+                            <td class=" fw-semibold text-uppercase" th:text="${s.name}">ENGLISH</td>
+                            <td th:text="${s.code}">0002</td>
+                            <td th:text="${s.reference}">Grade 1</td>
+                            <!-- STATUS -->
+                            <td>
+                                <span th:if="${s.active}" class="badge bg-success">
+                                    <i class="bi bi-check-circle"></i>
+                                    Active
+                                </span>
+                                <span th:unless="${s.active}" class="badge bg-secondary">
+                                    <i class="bi bi-x-circle"></i>
+                                    Inactive
+                                </span>
+                            </td>
+                            <!-- ACTIONS -->
+                            <td class="text-end" sec:authorize="hasAnyRole('ADMIN')">
+                                <div class="btn-group">
+                                    <!-- EDIT -->
+                                    <a class="text-primary m-1" data-bs-toggle="modal"
+                                        th:data-bs-target="'#editSubject' + ${s.id}" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+
+                                    <a class="text-warning m-1" data-bs-toggle="modal"
+                                        th:data-bs-target="'#toggleSubject' + ${s.id}"
+                                        th:title="${s.active ? 'Deactivate' : 'Activate'}">
+                                        <i th:class="${s.active}
+                                            ? 'bi bi-toggle-on'
+                                            : 'bi bi-toggle-off'"></i>
+                                    </a>
+
+                                    <!-- DELETE -->
+                                    <a class="text-danger m-1" data-bs-toggle="modal"
+                                        th:data-bs-target="'#deleteSubject' + ${s.id}" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+
+                                <!-- TOGGLE ROLE -->
+                                <div class="modal fade" th:id="'toggleSubject' + ${s.id}" tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header border-0">
+                                                <h5 class="modal-title fw-bold">
+                                                    <span th:text="${s.active ? 'Deactivate' : 'Activate'}"></span>
+                                                    Subject
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                </button>
+                                            </div>
+                                            <div class="modal-body text-start">
+                                                Are you sure you want to <span
+                                                    th:text="${s.active ? 'Deactivate ' : 'Activate '}"></span>
+                                                <strong th:text="${s.name}">
+                                                    Subject
+                                                </strong>?
+                                                <br>
+                                                <small class="text-danger">
+                                                    This action can be undone at a fee.
+                                                </small>
+                                            </div>
+                                            <div class="modal-footer border-0">
+                                                <button type="button" class="btn btn-sm btn-secondary"
+                                                    data-bs-dismiss="modal">
+                                                    Cancel
+                                                </button>
+                                                <form th:action="@{/subjects/toggle/{id}(id=${s.id})}"
+                                                    method="post">
+                                                    <button type="submit" class="" th:class="${s.active}
+                                            ? 'btn btn-sm btn-danger'
+                                            : 'btn btn-sm btn-success'">
+                                                        <span th:text="${s.active ? 'Deactivate' : 'Activate'}">
+                                                            Toggle <span>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--END TOGGLE MODAL-->
+
+                                <!-- DELETE SUBJECT -->
+                                <div class="modal fade" th:id="'deleteSubject' + ${s.id}" tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header border-0">
+                                                <h5 class="modal-title fw-bold">
+                                                    Delete subject
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                </button>
+                                            </div>
+                                            <div class="modal-body text-start">
+                                                Are you sure you want to delete
+                                                <strong th:text="${s.name}">
+                                                    Subject
+                                                </strong>?
+                                                <br>
+                                                <small class="text-danger">
+                                                    This action cannot be undone.
+                                                </small>
+                                            </div>
+                                            <div class="modal-footer border-0">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    Cancel
+                                                </button>
+                                                <form th:action="@{/subjects/delete/{id}(id=${s.id})}"
+                                                    method="post">
+                                                    <button type="submit" class="btn btn-danger">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--END DELETE MODAL-->
+                            </td>
+
+                            <!-- EDIT SUBJECT -->
+                            <div class="modal fade" th:id="'editSubject' + ${s.id}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-md modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <form th:action="@{/subjects/update/{id}(id=${s.id})}" method="post">
+                                            <!-- HEADER -->
+                                            <div class="modal-header border-0">
+                                                <h5 class="modal-title fw-bold">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                    Edit Subject
+                                                </h5>
+
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                </button>
+                                            </div>
+
+                                            <!-- BODY -->
+                                            <div class="modal-body">
+                                                <div class="row g-3">
+                                                    <!-- NAME -->
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">
+                                                            Subject Name
+                                                        </label>
+                                                        <input type="text" class="form-control" name="name"
+                                                            placeholder="Role name" th:value="${s.name}" required>
+                                                    </div>
+                                                    <!-- CODE -->
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">
+                                                            Subject code
+                                                        </label>
+                                                        <input type="text" class="form-control" name="code"
+                                                            placeholder="Role name" th:value="${s.code}" required>
+                                                    </div>
+
+                                                    <!-- DESCRIPTION -->
+                                                    <div class="col-md-12">
+                                                        <label class="form-label">
+                                                            Description
+                                                        </label>
+                                                        <textarea rows="3" maxlength="200" class="form-control"
+                                                            name="description" placeholder="Description" required
+                                                            th:text="${s.description}"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- FOOTER -->
+                                            <div class="modal-footer border-0">
+                                                <button type="reset" class="btn btn-warning">
+                                                    Clear
+                                                </button>
+
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="bi bi-save"></i>
+                                                    Update
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </tr>
+
+                        <!-- EMPTY -->
+                        <tr th:if="${#lists.isEmpty(subjects)}">
+                            <td colspan="6" class="text-center py-5">
+                                <h5 class="mt-3">
+                                    No learning area found
+                                </h5>
+                                <p class="text-muted">
+                                    Add your first subject to get started.
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Card Footer -->
+            <div class="card-footer bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Records are maintained for security and accountability.
+                    </small>
+                    <span class="badge bg-secondary" th:if="${subjects != null}"
+                        th:text="${#lists.size(subjects) + ' Entries'}">0 Entries</span>
+                </div>
+            </div>
+        </div>
+    </main><!-- End #main -->
+
+    <!-- ADD SUBJECT MODAL -->
+    <div class="modal fade" id="addSubject" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form th:action="@{/subjects/save}" method="post">
+                <div class="modal-content">
+                    <!-- HEADER -->
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title fw-bold">Add subject</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <!-- BODY -->
+                    <div class="modal-body">
+                        <div class="row">
+                            <!-- SUBJECT / LEARNING AREA -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Learning area*</label>
+                                <input type="text" name="name" id="subName" class="form-control"
+                                    placeholder="Subject name" required>
+                            </div>
+
+                            <!-- CODE -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Code*</label>
+                                <input type="text" name="code" id="subCode" class="form-control"
+                                    placeholder="Code eg. 200" required>
+                            </div>
+
+                            <!-- DESCRIPTION -->
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea name="description" id="annMessage" class="form-control" rows="4"
+                                    placeholder="Description of the subject" maxlength="200" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-sm btn-warning">
+                            Clear
+                        </button>
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="bi bi-save"></i>
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div><!--END SUBJECT MODAL-->
+
+    <!-- =====footer===== -->
+    <th:block th:insert="~{partials/_footer}" />
+
+</body>
+
+</html>

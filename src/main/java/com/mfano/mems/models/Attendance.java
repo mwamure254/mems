@@ -21,6 +21,6 @@ public class Attendance extends BaseObject{
     private LocalTime timeIn;
     private LocalTime timeOut;
 
-    @Column(name = "branch_id", insertable=false, updatable=false)
+    @Column(name = "branch_id")
     private Long branch;
 }

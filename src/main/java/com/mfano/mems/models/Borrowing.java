@@ -15,12 +15,15 @@ import lombok.Setter;
 @Setter
 @Getter
 public class Borrowing extends BaseObject {
-    private Long bookId;
-    private Long studentId;
-    private LocalDate borrowedDate;
+    @Column(name = "book_id")
+    private Long book;
+    @Column(name = "student_id")
+    private Long student;
+    @Column(name = "staff_id")
+    private Long staff;
+    //this.createdAt; // borrowedDate;
     private LocalDate dueDate;
-    private String status = "OUT";// IN/RETURNED
 
-    @Column(name = "branch_id", insertable=false, updatable=false)
+    @Column(name = "branch_id")
     private Long branch;
 }

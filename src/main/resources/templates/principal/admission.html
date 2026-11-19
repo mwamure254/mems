@@ -3,10 +3,10 @@
 
 <th:block th:replace="~{partials/_header :: common_header(~{::title/text()},~{::link},~{::meta})}">
     <!-- Custom meta data for this template-->
-    <meta name="description" content="mems announcements page">
+    <meta name="description" content="mems admission page">
     <meta name="author" content="mfano">
     <!-- Custom title for this page-->
-    <title>MEMS | Announcements</title>
+    <title>MEMS | Admission</title>
     <!-- Custom styles for this page-->
 </th:block>
 
@@ -20,18 +20,17 @@
     <th:block th:insert="~{partials/_sidebar}" />
     <!-- =====End Sidebar=====-->
 
-    <main id="main" class="main dashboard d-flex flex-column min-vh-100">
+    <main id="main" class="main">
 
         <!-- Page Heading -->
         <div class="pagetitle d-sm-flex align-items-center justify-content-between mb-4">
             <div>
                 <h1 class="fw-bold mb-1">
-                    <i class="bi bi-megaphone"></i>
                     Students
                 </h1>
 
                 <p class="text-muted mb-0">
-                    All learners in the school
+                    All admitted learners in the school
                 </p>
             </div>
 
@@ -64,8 +63,8 @@
                                 <i class="bi bi-search"></i>
                             </span>
 
-                            <input type="text" id="tableSearch" class="form-control"
-                                placeholder="Search announcement...">
+                            <input type="text" id="studentSearch" class="form-control"
+                                onkeyup="searchTable('studentSearch', 'studentTable')" placeholder="Search students...">
                         </div>
                     </div>
                     <div class="mt-3 mt-md-0 d-flex flex-wrap">
@@ -96,10 +95,10 @@
                             </button>
                             <div class="dropdown-menu dropdown-menu-right shadow">
                                 <h6 class="dropdown-header">Filter By Grade</h6>
-                                <a class="dropdown-item" th:href="@{/announcements/filter(filter=${a.name})}"
-                                    th:each="g : ${grades}" th:value="${g.id}" th:text="${g.name}">Grade</a>
+                                <a class="dropdown-item" th:href="@{/students(filter=${g.id})}"
+                                    th:each="g : ${grades}" th:text="${g.name}">Grade</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" th:href="@{/announcements}">All Entries</a>
+                                <a class="dropdown-item" th:href="@{/students}">All Entries</a>
                             </div>
                         </div>
 
@@ -115,11 +114,11 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover mb-0" id="table">
+                        <table class="table table-hover mb-0" id="studentTable">
                             <thead class="table-light">
                                 <tr>
                                     <th>#</th>
-                                    <th>ADM NUMBER</th>
+                                    <th>ADM NO</th>
                                     <th>NAME</th>
                                     <th>GENDER</th>
                                     <th>GRADE</th>
@@ -131,41 +130,273 @@
                             </thead>
                             <tbody>
                                 <tr th:each="s, stat : ${students}">
-                                    <td th:text="${stat.index}">#</td>
+                                    <td th:text="${stat.count}">#</td>
                                     <td th:text="${s.admissionNumber}">001</td>
                                     <td th:text="${s.firstName + ' ' + s.lastName}">BRIAN MRAMBA</td>
                                     <td th:text="${s.gender}">Male</td>
-                                    <td th:text="${s.grade?.name}">Grade 2 RED</td>
+                                    <td th:text="${grade[s.grade] == null ? 'NONE' : grade[s.grade]?.name}">Grade 2 RED
+                                    </td>
                                     <td th:text="${s.parentName}">SHIDA MRAMBA</td>
                                     <td th:text="${s.parentPhone}">0711554411</td>
-                                    <td class="text-end">
-                                        <span th:if="${s.status == 'ACTIVE'}" class="badge rounded-pill text-white"
-                                            style="background:#00a67e;">Active</span>
-                                        <span th:if="${s.status == 'TRANSFERRED'}"
-                                            class="badge rounded-pill bg-light text-dark">Transferred</span>
-                                        <span th:if="${s.status == 'DECEASED'}"
-                                            class="badge rounded-pill bg-light text-warning">Deceased</span>
-                                        <span th:if="${s.status == 'SUSPENDED'}"
-                                            class="badge rounded-pill bg-light text-primary">Suspended</span>
+                                    <td>
+
+                                        <span th:if="${s.status == 'Active'}" class="badge bg-success" th:text="${s.status}">
+                                            <i class="bi bi-check-circle"></i>
+                                            Active
+                                        </span>
+                                        <span th:if="${s.status == 'Deceased'}" class="badge bg-danger" th:text="${s.status}">
+                                            <i class="bi bi-x-circle"></i>
+                                            Deceased
+                                        </span>
+                                        <span th:if="${s.status == 'Suspended'}" class="badge bg-warning" th:text="${s.status}">
+                                            <i class="bi bi-x-circle"></i>
+                                            Suspended
+                                        </span>
+                                        <span th:if="${s.status == 'Expelled'}" class="badge bg-danger" th:text="${s.status}">
+                                            <i class="bi bi-x-circle"></i>
+                                            Expelled
+                                        </span>
+                                        <span th:if="${s.status == 'Transferred'}" class="badge bg-info" th:text="${s.status}">
+                                            <i class="bi bi-x-circle"></i>
+                                            transferred
+                                        </span>
+                                        <span th:if="${s.status == 'Dropped'}" class="badge bg-secondary" th:text="${s.status}">
+                                            <i class="bi bi-x-circle"></i>
+                                            Dropped
+                                        </span>
                                     </td>
                                     <td class="text-end">
-                                        <a href="#" class="text-muted me-2" data-bs-toggle="modal"
-                                            data-bs-target="#studentModal"
-                                            th:attr="data-id=${s.id}, data-adm=${s.admNo}, data-name=${s.name}, data-gender=${s.gender}, 
-                                            data-grade=${s.className}, data-guardian=${s.guardian}, data-phone=${s.phone}">
-                                            <i class="fa-solid fa-pen"></i>
-                                        </a>
-                                        <a th:href="@{/students/delete/{id}(id=${s.id})}" class="text-danger"
-                                            onclick="return confirm('Delete this student?')">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </a>
+                                        <div class="btn-group">
+                                            <!-- EDIT -->
+                                            <a class="text-primary m-1" data-bs-toggle="modal"
+                                                th:data-bs-target="'#editStudent' + ${s.id}" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+
+                                            <a class="text-warning m-1" data-bs-toggle="modal"
+                                                th:data-bs-target="'#toggleStudent' + ${s.id}"
+                                                th:title="${s.active ? 'Deactivate' : 'Activate'}">
+                                                <i th:class="${s.active}
+                                            ? 'bi bi-toggle-on'
+                                            : 'bi bi-toggle-off'"></i>
+                                            </a>
+
+                                            <!-- DELETE -->
+                                            <a class="text-danger m-1" data-bs-toggle="modal"
+                                                th:data-bs-target="'#deleteStudent' + ${s.id}" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+
+                                        <!-- TOGGLE STUDENT -->
+                                        <div class="modal fade" th:id="'toggleStudent' + ${s.id}" tabindex="-1">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="modal-title fw-bold">
+                                                            <span
+                                                                th:text="${s.active ? 'Deactivate' : 'Activate'}"></span>
+                                                            Student
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body text-start">
+                                                        Are you sure you want to <span
+                                                            th:text="${s.active ? 'Deactivate ' : 'Activate '}"></span>
+                                                        <strong>
+                                                            this student
+                                                        </strong>?
+                                                        <br>
+                                                        <small class="text-danger">
+                                                            This action can be undone at a fee.
+                                                        </small>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-sm btn-secondary"
+                                                            data-bs-dismiss="modal">
+                                                            Cancel
+                                                        </button>
+                                                        <form th:action="@{/students/toggle/{id}(id=${s.id})}"
+                                                            method="post">
+                                                            <button type="submit" class="" th:class="${s.active}
+                                            ? 'btn btn-sm btn-danger'
+                                            : 'btn btn-sm btn-success'">
+                                                                <span th:text="${s.active ? 'Deactivate' : 'Activate'}">
+                                                                    Toggle <span>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--END TOGGLE MODAL-->
+
+                                        <!-- DELETE MODAL -->
+                                        <div class="modal fade" th:id="'deleteStudent' + ${s.id}" tabindex="-1">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="modal-title fw-bold">
+                                                            Delete Student
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body text-start">
+                                                        Are you sure you want to delete
+                                                        <strong>
+                                                            this student
+                                                        </strong>?
+                                                        <br>
+                                                        <small class="text-danger">
+                                                            This action cannot be undone.
+                                                        </small>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-sm btn-secondary"
+                                                            data-bs-dismiss="modal">
+                                                            Cancel
+                                                        </button>
+                                                        <form th:action="@{/students/delete/{id}(id=${s.id})}"
+                                                            method="post">
+                                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                                <i class="bi bi-trash"></i>
+                                                                Delete
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><!--END DELETE MODAL-->
+
                                     </td>
+
+                                    <!-- EDIT STUDENT MODAL -->
+                                    <div class="modal fade" th:id="'editStudent' + ${s.id}" tabindex="-1">
+                                        <div class="modal-dialog modal-lg">
+                                            <form th:action="@{/students/update/{id}(id=${s.id})}" method="post"
+                                                enctype="multipart/form-data" accept="image">
+                                                <div class="modal-content">
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="modal-title fw-bold">Edit student</h5>
+                                                        <button type="button" class="btn-close"
+                                                            data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="row">
+                                                            <div class="col-md-4 mb-3">
+                                                                <label class="form-label">Adm Number *</label>
+                                                                <input type="text" name="admissionNumber"
+                                                                    th:value="${s.admissionNumber}" class="form-control"
+                                                                    required>
+                                                            </div>
+                                                            <div class="col-md-4 mb-3">
+                                                                <label class="form-label">Grade *</label>
+                                                                <select name="grade" class="form-select" required>
+                                                                    <option value="">Select</option>
+                                                                    <option th:each="g : ${grades}" th:value="${g.id}"
+                                                                        th:selected="${g.id == s.grade}"
+                                                                        th:text="${g.name}">
+                                                                        Grade 1 RED</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-md-4 mb-3">
+                                                                <label class="form-label">Gender *</label>
+                                                                <select name="gender" class="form-select" required>
+                                                                    <option value="">Select</option>
+                                                                    <option value="Male"
+                                                                        th:selected="${s.gender == 'Male'}">Male
+                                                                    </option>
+                                                                    <option value="Female"
+                                                                        th:selected="${s.gender == 'Female'}">Female
+                                                                    </option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-6 mb-3">
+                                                                <label class="form-label">First Name *</label>
+                                                                <input type="text" name="firstName"
+                                                                    th:value="${s.firstName}" class="form-control"
+                                                                    required>
+                                                            </div>
+                                                            <div class="col-md-6 mb-3">
+                                                                <label class="form-label">Last Name *</label>
+                                                                <input type="text" name="lastName"
+                                                                    th:value="${s.lastName}" class="form-control"
+                                                                    required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-6 mb-3">
+                                                                <label class="form-label">Other Name </label>
+                                                                <input type="text" name="otherName"
+                                                                    th:value="${s.otherName}" class="form-control">
+                                                            </div>
+                                                            <div class="col-md-3 mb-3">
+                                                                <label class="form-label">D.O.B *</label>
+                                                                <input type="date" name="dob" th:value="${s.dob}"
+                                                                    class="form-control" required>
+                                                            </div>
+                                                            <div class="col-md-3 mb-3">
+                                                                <label class="form-label">Stream </label>
+                                                                <input type="text" name="stream" th:value="${s.stream}"
+                                                                    class="form-control">
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-6 mb-3">
+                                                                <label class="form-label">Guardian *</label>
+                                                                <input type="text" name="parentName"
+                                                                    th:value="${s.parentName}" class="form-control"
+                                                                    required>
+                                                            </div>
+                                                            <div class="col-md-6 mb-3">
+                                                                <label class="form-label">Phone *</label>
+                                                                <input type="text" name="parentPhone"
+                                                                    th:value="${s.parentPhone}" class="form-control"
+                                                                    required>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row">
+                                                            <!-- FILE -->
+                                                            <div class="col-md-8 mb-3">
+                                                                <label class="form-label">
+                                                                    Select image
+                                                                </label>
+                                                                <input name="file" type="file" class="form-control">
+                                                            </div>
+                                                            <div class="col-md-4 mb-3">
+                                                                <label class="form-label">Status *</label>
+                                                                <select name="status" id="stuStatus" class="form-select"
+                                                                    required>
+                                                                    <option value="">SELECT</option>
+                                                                    <option value="Active" th:selected="${s.status == 'Active'}">Active</option>
+                                                                    <option value="Transferred" th:selected="${s.status == 'Transferred'}">Transferred</option>
+                                                                    <option value="Suspended" th:selected="${s.status == 'Suspended'}">Suspended</option>
+                                                                    <option value="Expelled" th:selected="${s.status == 'Expelled'}">Expelled</option>
+                                                                    <option value="Deceased" th:selected="${s.status == 'Deceased'}">Deceased</option>
+                                                                    <option value="Dropped" th:selected="${s.status == 'Dropped'}">Dropped</option>
+                                                                    <option value="Graduated" th:selected="${s.status == 'Graduated'}">Graduated</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="reset" class="btn btn-warning">Clear</button>
+                                                        <button type="submit" class="btn btn-success">Save</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </tr>
 
                                 <!-- EMPTY -->
-                                <tr th:if="${#lists.isEmpty(announcements)}">
+                                <tr th:if="${#lists.isEmpty(students)}">
                                     <td colspan="9" class="text-center py-5">
-                                        <i class="bi bi-megaphone fs-1 text-muted"></i>
                                         <h5 class="mt-3">
                                             No students admitted yet
                                         </h5>
@@ -194,12 +425,12 @@
         </div>
     </main><!-- End #main -->
 
-    <!-- ADD/EDIT STUDENT MODAL -->
+    <!-- ADD STUDENT MODAL -->
     <div class="modal fade" id="studentModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
-            <form th:action="@{/students/save}" method="post">
+            <form th:action="@{/students/save}" method="post" enctype="multipart/form-data" accept="image">
                 <div class="modal-content">
-                    <div class="modal-header">
+                    <div class="modal-header border-0">
                         <h5 class="modal-title fw-bold">Add student</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
@@ -209,13 +440,14 @@
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Adm Number *</label>
-                                <input type="text" name="admmissionNumber" id="stuAdm" class="form-control" required>
+                                <input type="text" name="admissionNumber" id="stuAdm" class="form-control" required>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Grade *</label>
-                                <select name="className" id="stuGrade" class="form-select" required>
+                                <select name="grade" id="stuGrade" class="form-select" required>
                                     <option value="">Select</option>
-                                    <option th:each="g : ${grades}" th:value="${g}" th:text="${g}">Grade 1 RED</option>
+                                    <option th:each="g : ${grades}" th:value="${g.id}" th:text="${g.name}">Grade 1 RED
+                                    </option>
                                 </select>
                             </div>
                             <div class="col-md-4 mb-3">
@@ -238,11 +470,15 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-8 mb-3">
-                                <label class="form-label">Other Name *</label>
-                                <input type="text" name="otherName" id="otherName" class="form-control" required>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Other Name</label>
+                                <input type="text" name="otherName" id="otherName" class="form-control">
                             </div>
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">D.O.B *</label>
+                                <input type="date" name="dob" id="stuDOB" class="form-control" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
                                 <label class="form-label">Stream </label>
                                 <input type="text" name="stream" id="stuStream" class="form-control" required>
                             </div>
@@ -255,6 +491,27 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Phone *</label>
                                 <input type="text" name="parentPhone" id="stuPhone" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- FILE -->
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label">
+                                    Select image
+                                </label>
+                                <input name="file" type="file" class="form-control">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Status *</label>
+                                <select name="status" id="stuStatus" class="form-select" required>
+                                    <option value="">SELECT</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Transferred">Transferred</option>
+                                    <option value="Suspended">Suspended</option>
+                                    <option value="Expelled">Expelled</option>
+                                    <option value="Graduated">Graduated</option>
+                                </select>
                             </div>
                         </div>
                     </div>

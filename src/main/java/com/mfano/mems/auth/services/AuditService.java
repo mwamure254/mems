@@ -2,6 +2,7 @@ package com.mfano.mems.auth.services;
 
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import com.mfano.mems.auth.models.AuditEntry;
@@ -25,6 +26,12 @@ public class AuditService {
 
     public List<AuditEntry> findAll() {
         return repo.findAll();
+    }
+
+    public List<AuditEntry> findByBranch(Long id) {
+        return findAll().stream()
+        .filter(entry -> entry.getBranch() == id )
+        .toList();
     }
 
     public List<AuditEntry> findByAction(String action) {

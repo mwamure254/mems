@@ -2,11 +2,16 @@ package com.mfano.mems.dtos;
 
 import java.util.List;
 
-public class ReportCardDt {
+import lombok.Getter;
+import lombok.Setter;
+
+
+@Getter @Setter
+public class ReportCardDTO {
     private String studentName;
     private String admNo;
     private String grade;
-    //private List<MarkDTO> marks;
+    private List<MarkDto> marks;
     private Integer total;
     private Double average;
     private Integer maxTotal;

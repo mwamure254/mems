@@ -16,23 +16,17 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.mfano.mems.config.CustomUserDetails;
+import com.mfano.mems.dtos.EntityDto;
 import com.mfano.mems.dtos.UserDto;
 import com.mfano.mems.utils.documents.FileUpload;
 import com.mfano.mems.auth.services.BranchService;
-import com.mfano.mems.auth.services.GradeService;
 import com.mfano.mems.auth.services.ProfileService;
-import com.mfano.mems.auth.models.Branch;
-import com.mfano.mems.auth.models.Grade;
 import com.mfano.mems.auth.models.Profile;
-import com.mfano.mems.auth.models.Role;
-import com.mfano.mems.auth.models.Term;
 import com.mfano.mems.auth.models.User;
 import com.mfano.mems.auth.services.AuditService;
 import com.mfano.mems.auth.services.RoleService;
-import com.mfano.mems.auth.services.TermService;
 import com.mfano.mems.auth.services.UserService;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -46,45 +40,24 @@ public class AdminController {
     private final BranchService storeService;
     private final ProfileService profileService;
     private final FileUpload fileUpload;
-    private final GradeService gradeService;
-    private final TermService termService;
 
     // manage /GET/* module
     @GetMapping("/{option}")
-    public String manage(@AuthenticationPrincipal CustomUserDetails auth, @PathVariable String option, Model red) {
+    public String manageAdmin(@AuthenticationPrincipal CustomUserDetails auth, @PathVariable String option, Model red) {
         userService.getPrices(auth, red);
 
         String dir = "redirect:/";
         switch (option) {
             case "dashboard":
-                red.addAttribute("users", userService.findAll());
-                red.addAttribute("stores", storeService.findAll());
-                red.addAttribute("roles", roleService.findAll());
-                red.addAttribute("audits", auditService.findAll());
                 dir = "admin/index";
                 break;
 
             case "users":
-
+                red.addAttribute("users", userService.findAll());
+                red.addAttribute("stores", storeService.findAll());
+                red.addAttribute("roles", roleService.findAll());
                 red.addAttribute("userDto", new UserDto());
-                Long storeId = auth.getUser().getBranch().getId();
-
-                if (storeId != null) {
-                    // red.addAttribute("users", userService.findByBranch_Id(storeId));
-                    red.addAttribute("users", userService.findAll());
-
-                } else {
-                    red.addAttribute("users", userService.findAll());
-                }
-                red.addAttribute("stores", storeService.findAll());
-                red.addAttribute("roles", roleService.findAll());
                 dir = "admin/users";
-                break;
-
-            case "roles":
-                red.addAttribute("roles", roleService.findAll());
-                red.addAttribute("stores", storeService.findAll());
-                dir = "admin/roles";
                 break;
 
             case "audits":
@@ -92,107 +65,47 @@ public class AdminController {
                 dir = "admin/audits";
                 break;
 
-            case "administration":
-                red.addAttribute("branches", storeService.findAll());
-                red.addAttribute("grades", gradeService.findAll());
-                red.addAttribute("terms", termService.findAll());
+            case "roles":
                 red.addAttribute("roles", roleService.findAll());
-                red.addAttribute("branch", new Branch());
-                red.addAttribute("grade", new Grade());
-                red.addAttribute("term", new Term());
-                dir = "security/administration";
+                dir = "admin/roles";
                 break;
         }
 
         return dir;
     }
 
-    @PostMapping("/branches/save")
-    public String save(
-            @ModelAttribute Branch branch, @AuthenticationPrincipal CustomUserDetails auth, 
-            RedirectAttributes redirectAttributes) {
-        try {
-            storeService.createBranch(branch, auth.getBranch().getId(), redirectAttributes);
-        } catch (Exception e) {
-            e.printStackTrace();
-            redirectAttributes.addAttribute("error", "Operation not successful.");
-        }
-        return "redirect:/admin/administration";
-    }
-
-    @PostMapping("/branches/update/{id}")
-    public String update(
-            @PathVariable Long id, @AuthenticationPrincipal CustomUserDetails auth, 
-            @ModelAttribute Branch branch,
-            RedirectAttributes redirectAttributes) {
-        try {
-            storeService.updateBranch(auth.getBranch().getId(), id, branch, redirectAttributes);
-        } catch (Exception e) {
-            e.printStackTrace();
-            redirectAttributes.addAttribute("error", "Operation not successful.");
-        }
-        return "redirect:/admin/branches";
-    }
-
-    @PostMapping("/branches/toggle/{id}")
-    public String toggle(
-            @PathVariable Long id,
-            RedirectAttributes redirectAttributes) {
-        try {
-            storeService.toggleActive(id, redirectAttributes);
-        } catch (Exception e) {
-            e.printStackTrace();
-            redirectAttributes.addAttribute("error", "Operation not successful.");
-        }
-        return "redirect:/admin/administration";
-    }
-
-    @PostMapping("/branches/delete/{id}")
-    public String delete(@AuthenticationPrincipal CustomUserDetails auth, 
-            @PathVariable Long id,
-            RedirectAttributes redirectAttributes) {
-        try {
-            storeService.deleteBranch(auth.getBranch().getId(), id, redirectAttributes);
-        } catch (Exception e) {
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error", "Operation not successful.");
-        }
-        return "redirect:/admin/administration";
-    }
-
-    // Role saving
+    // Role /gRADE saving
     @PostMapping("/roles/save")
-    public String saveRole(@ModelAttribute Role role,
+    public String saveEntity(@ModelAttribute EntityDto ent, 
             @AuthenticationPrincipal CustomUserDetails auth, RedirectAttributes red) {
-        try {
-            roleService.save(role, red, auth.getBranch().getId());
-        } catch (Exception e) {
-            e.printStackTrace();
-            red.addAttribute("error", "Operation not successful.");
-        }
-        return "redirect:/admin/roles";
+                try {
+                    roleService.save(ent, red, auth.getBranch().getId());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    red.addAttribute("error", "Operation not successful.");
+                }
+                return "redirect:/admin/roles";
     }
 
     // Role update
     @PostMapping("/roles/update/{id}")
-    public String updateRole(@AuthenticationPrincipal CustomUserDetails auth,
-            @PathVariable Long id,
-            @Valid Role role,
+    public String updateEntity(@AuthenticationPrincipal CustomUserDetails auth,
+            @PathVariable Long id, 
+            @ModelAttribute EntityDto role,
             RedirectAttributes redirectAttributes) {
-        try {
-            roleService.update(id, role, redirectAttributes, auth.getBranch().getId());
+                try {
+                    roleService.update(id, role, redirectAttributes, auth.getBranch().getId());
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            redirectAttributes.addAttribute("error", "Operation not successful.");
-        }
-
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    redirectAttributes.addAttribute("error", "Operation not successful.");
+                }
         return "redirect:/admin/roles";
     }
 
     // manage /roles/* module
     @PostMapping("/roles/{option}/{id}")
-    public String manage(@PathVariable String option,
+    public String manageRoles(@PathVariable String option,
             @PathVariable Long id, @AuthenticationPrincipal CustomUserDetails auth,
             RedirectAttributes redirectAttributes) {
 
@@ -205,7 +118,7 @@ public class AdminController {
                     e.printStackTrace();
                     redirectAttributes.addAttribute("error", "Operation not allowed");
                 }
-                dir = "redirect:/admin/roles";
+                dir = "redirect:/admin/administration";
                 break;
 
             case "toggle":
@@ -215,7 +128,7 @@ public class AdminController {
                     e.printStackTrace();
                     redirectAttributes.addAttribute("error", "Operation not allowed");
                 }
-                dir = "redirect:/admin/roles";
+                dir = "redirect:/admin/administration";
                 break;
         }
 
@@ -225,12 +138,12 @@ public class AdminController {
     // save user
     @PostMapping("/users/save")
     public String saveUser(@ModelAttribute UserDto userDto, @RequestParam("file") MultipartFile file,
-            RedirectAttributes red) {
+            RedirectAttributes red, @AuthenticationPrincipal CustomUserDetails auth) {
         try {
             if (file != null && !file.isEmpty()) {
                 userDto.setImage(fileUpload.uploadFile(file, "profiles", red));
             }
-            userService.registerUser(userDto, red);
+            userService.registerUser(auth.getBranch().getId(), userDto, red);
         } catch (Exception e) {
             e.printStackTrace();
             red.addAttribute("error", "Operation not successful.");
@@ -242,13 +155,12 @@ public class AdminController {
     @PostMapping("/users/update/{id}")
     public String updateUser(@AuthenticationPrincipal CustomUserDetails auth,
             @PathVariable Long id, @RequestParam("file") MultipartFile file,
-            @Valid UserDto userDto,
-            RedirectAttributes red) {
+            @ModelAttribute UserDto userDto, RedirectAttributes red) {
         try {
             if (file != null && !file.isEmpty()) {
                 userDto.setImage(fileUpload.uploadFile(file, "profiles", red));
             }
-            userService.update(auth, id, userDto, red);
+            userService.update(auth.getBranch().getId(), id, userDto, red);
         } catch (Exception e) {
             e.printStackTrace();
             red.addFlashAttribute("error", "Operation not successful.");

@@ -19,7 +19,6 @@ public class Staff extends BaseObject{
     private String lastName; 
     private String otherName; 
     private String staffNumber; // TSC Number, ID Number
-    private String subjects; // MATHS, ENGLISH
     private String jobType; // TEACHNG STAFF, SUPPORT STAFF
     private String jobTitle; // GATEMAN, COOK, TEACHER, BURSAR
     private String gender; // MALE, FEMALE
@@ -30,6 +29,6 @@ public class Staff extends BaseObject{
     private String responsibility; //GAMES TEACHER/ CLUBS' TEACHER
     private LocalDate joinedDate;
 
-    @Column(name = "branch_id", insertable=false, updatable=false)
+    @Column(name = "branch_id")
     private Long branch;
 }

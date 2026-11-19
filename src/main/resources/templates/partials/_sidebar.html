@@ -1,84 +1,181 @@
 <!-- ======= Sidebar ======= -->
 <aside id="sidebar" class="sidebar">
 
-  <div class="p-4 align-items-center text-center ">
+  <div class="p-4 align-items-center text-center" th:unless="${author.branch?.name == 'HQ'}">
     <div class="bg-warning rounded-circle me-2">
-      <i class="bx bxs-graduation text-dark" style="font-size:30px;"></i>
+      <i class="bx bxs-graduation text-dark" style="font-size:36px;"></i>
     </div>
     <div class="justify-content-center">
       <h6 class="mb-0 fw-bold" th:text="${author.branch?.name}">SHAKADULO</h6>
-      <small style="font-size:10px;">COMPREHENSIVE SCHOOL</small>
+      <small> <span th:text="${author.branch?.type ?: 'COMPREHENSIVE'}"></span> SCHOOL</small>
     </div>
   </div>
 
   <ul class="sidebar-nav" id="sidebar-nav">
 
+    <!-- Dashboard -->
     <li class="nav-item">
-      <a class="nav-link collapsed" href="/">
-        <i class="bi bi-grid-fill"></i>
+      <a class="nav-link" th:href="@{/}">
+        <i class="bi bi-grid"></i>
         <span>Overview</span>
       </a>
-    </li><!-- End Dashboard Nav -->
+    </li>
 
-    <li sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL', 'TEACHER')" class="nav-item">
-      <a class="nav-link collapsed" href="#"><i class="ri ri-folder-user-fill me-2"></i> Teaching Staff</a>
-    </li><!-- End Teaching Staff Nav -->
+    <!-- ADMINISTRATION -->
+    <li class="nav-item" th:if="${author.branch?.name == 'HQ'}">
+      <a class="nav-link collapsed" data-bs-toggle="collapse" href="#adminMenu" aria-expanded="false"
+        aria-controls="adminMenu">
+        <i class="bi bi-shield-lock"></i>
+        <span>Administration</span>
+        <i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="adminMenu" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+        <li>
+          <a th:href="@{/admin/roles}">
+            <i class="bi bi-key"></i>User Roles
+          </a>
+        </li>
+        <li>
+          <a th:href="@{/schools}">
+            <i class="bi bi-key"></i>Schools Accounts
+          </a>
+        </li>
 
-    <li sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL')" class="nav-item">
-      <a class="nav-link collapsed" href="#"><i class="bi bi-person-lines-fill me-2"></i> Support Staff</a>
-    </li><!-- End support Staff Nav -->
+        <li>
+          <a th:href="@{/subjects}"><i class="bi bi-key"></i> Subjects</a>
+        </li><!-- End Subjects Nav -->
 
-    <li sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL', 'TEACHER', 'BURSAR', 'LIBRARY')" class="nav-item">
-      <a class="nav-link collapsed" href="#"><i class="bi bi-clock-fill me-2"></i> Staff Attendance</a>
-    </li><!-- End Staff Attendance Nav -->
+        <li>
+          <a th:href="@{/grades}">
+            <i class="bi bi-key"></i>School Grades
+          </a>
+        </li>
+        <li>
+          <a th:href="@{/sessions}">
+            <i class="bi bi-key"></i>School Sessions
+          </a>
+        </li>
+        <li>
+          <a th:href="@{/admin/users}">
+            <i class="bi bi-key"></i>User Accounts
+          </a>
+        </li>
+        <li>
+          <a th:href="@{/admin/audits}">
+            <i class="bi bi-key"></i>Audit Logs
+          </a>
+        </li>
 
-    <li sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL', 'TEACHER')" class="nav-item">
-      <a class="nav-link collapsed" href="#"><i class="bi bi-book-half me-2"></i> Subjects</a>
-    </li><!-- End Subjects Nav -->
+      </ul>
+    </li>
 
-    <li sec:authorize="hasRole('PRINCIPAL')" class="nav-item">
-      <a class="nav-link collapsed" href="/students"><i class="bi bi-person-plus-fill me-2"></i> Admission</a>
-    </li><!-- End Admission Nav -->
+    <!-- STUDENTS -->
+    <li class="nav-item" th:unless="${author.branch?.name == 'HQ'}" sec:authorize="hasAnyRole('PRINCIPAL', 'TEACHER')">
+      <a class="nav-link collapsed" data-bs-toggle="collapse" href="#studentsMenu" aria-expanded="false"
+        aria-controls="studentsMenu">
+        <i class="bi bi-people-fill me-2"></i>
+        <span>Students</span>
+        <i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="studentsMenu" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+        <li><a th:href="@{/students}"><i class="bi bi-key"></i>Learners</a></li>
+        <li sec:authorize="hasRole('PRINCIPAL')"><a th:href="@{/students/admission}"><i
+              class="bi bi-key"></i>Admission</a></li>
+        <li><a th:href="@{/transfers}"><i class="bi bi-key"></i>Transfers</a></li>
+        <li><a th:href="@{/students/disciplinary}"><i class="bi bi-key"></i>Disciplinary</a></li>
+        <li><a th:href="@{/marks/report-cards}"><i class="bi bi-key"></i>Report Cards</a></li>
+      </ul>
+    </li>
 
-    <li sec:authorize="hasAnyRole('PRINCIPAL', 'TEACHER')" class="nav-item">
-      <a class="nav-link collapsed" href="#"><i class="bi bi-people-fill me-2"></i> Students</a>
-    </li><!-- End Students Nav -->
+    <!-- FINANCES -->
+    <li class="nav-item" th:unless="${author.branch?.name == 'HQ'}" sec:authorize="hasAnyRole('PRINCIPAL', 'BURSAR')">
+      <a class="nav-link collapsed" data-bs-toggle="collapse" href="#feesMenu" aria-expanded="false"
+        aria-controls="feesMenu">
+        <i class="bi bi-wallet-fill me-2"></i>
+        <span>Finances</span>
+        <i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="feesMenu" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+        <li><a th:href="@{/fees}"><i class="bi bi-key"></i>Student Fees</a></li>
+        <li><a th:href="@{/fees/balances}"><i class="bi bi-key"></i>Fee Balances</a></li>
+        <li><a th:href="@{/fees/payments}"><i class="bi bi-key"></i>Fee Payments</a></li>
+      </ul>
+    </li>
 
-    <li sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL', 'TEACHER')" class="nav-item">
-      <a class="nav-link collapsed" href="#"><i class="bi bi-building-fill me-2"></i> Streams</a>
-    </li><!-- End Streams Nav -->
+    <!-- LIBRARY -->
+    <li class="nav-item" th:unless="${author.branch?.name == 'HQ'}" sec:authorize="hasAnyRole('PRINCIPAL', 'LIBRARY')">
+      <a class="nav-link collapsed" data-bs-toggle="collapse" href="#libraryMenu" aria-expanded="false"
+        aria-controls="libraryMenu">
+        <i class="bx bx-book me-2"></i>
+        <span>Library</span>
+        <i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="libraryMenu" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+        <li><a th:href="@{/books}"><i class="bi bi-key"></i>Book Records</a></li>
+        <li><a th:href="@{/categories}"><i class="bi bi-key"></i>Book Categories</a></li>
+        <li><a th:href="@{/borrowings/student}"><i class="bi bi-key"></i>Student Borrowing</a></li>
+        <li><a th:href="@{/borrowings/staff}"><i class="bi bi-key"></i>Staff Borrowing</a></li>
+      </ul>
+    </li>
 
-    <li sec:authorize="hasAnyRole('PRINCIPAL', 'TEACHER', 'BURSAR', 'STUDENT')" class="nav-item">
-      <a class="nav-link collapsed" href="#"><i class="bi bi-wallet-fill me-2"></i> Fees</a>
-    </li><!-- End Fees Nav -->
+    <!-- EXAMINATION -->
+    <li class="nav-item" th:unless="${author.branch?.name == 'HQ'}" sec:authorize="hasRole('PRINCIPAL')">
+      <a class="nav-link collapsed" data-bs-toggle="collapse" href="#examinationMenu" aria-expanded="false"
+        aria-controls="examinationMenu">
+        <i class="bi bi-card-list me-2"></i>
+        <span>Examination</span>
+        <i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="examinationMenu" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+        <li><a th:href="@{/exams}"><i class="bi bi-key"></i>Student Exams</a></li>
+        <li><a th:href="@{/principal/exam-pass}"><i class="bi bi-key"></i>Exam Pass</a></li>
+        <li><a th:href="@{/marks/bulk-reports}"><i class="bi bi-key"></i>Report Cards</a></li>
+      </ul>
+    </li>
 
-    <li sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL', 'TEACHER')" class="nav-item">
-      <a class="nav-link collapsed" href="#"><i class="bi bi-card-list me-2"></i> Examination</a>
-    </li><!-- End Examination Nav -->
+    <!-- REMARKS -->
+    <li class="nav-item" th:unless="${author.branch?.name == 'HQ'}" sec:authorize="hasAnyRole('PRINCIPAL', 'TEACHER')">
+      <a class="nav-link collapsed" data-bs-toggle="collapse" href="#remarksMenu" aria-expanded="false"
+        aria-controls="remarksMenu">
+        <i class="bi bi-activity"></i>
+        <span>Remarks</span>
+        <i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="remarksMenu" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+        <li><a th:href="@{/remarks/subjects}"><i class="bi bi-key"></i>Subject Teachers</a></li>
+        <li><a th:href="@{/remarks/grades}"><i class="bi bi-key"></i>Class Teachers</a></li>
+        <li><a th:href="@{/remarks/principal}"><i class="bi bi-key"></i>Principal Remarks</a></li>
+      </ul>
+    </li>
 
-    <li sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT')" class="nav-item">
-      <a class="nav-link collapsed" href="#"><i class="bi bi-layout-text-window me-2"></i> Report Cards</a>
-    </li><!-- End Report Cards Nav -->
+    <!-- STAFF -->
+    <li class="nav-item" th:unless="${author.branch?.name == 'HQ'}" sec:authorize="hasAnyRole('PRINCIPAL', 'TEACHER')">
+      <a class="nav-link collapsed" data-bs-toggle="collapse" href="#staffMenu" aria-expanded="false"
+        aria-controls="staffMenu">
+        <i class="ri ri-folder-user-fill me-2"></i>
+        <span>Staff</span>
+        <i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="staffMenu" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+        <li><a th:href="@{/staff/teaching}"><i class="bi bi-key"></i>Teaching Staff</a></li>
+        <li><a th:href="@{/staff/support}"><i class="bi bi-key"></i>Support Staff</a></li>
+        <li><a th:href="@{/marks}"><i class="bi bi-key"></i>Student Marks</a></li>
+        <li><a th:href="@{/staff/subjects}"><i class="bi bi-key"></i>Subject Teachers</a></li>
+        <li sec:authorize="hasAnyRole('PRINCIPAL')"><a th:href="@{/staff/audits}"><i class="bi bi-key"></i>Audit
+            Logs</a></li>
+      </ul>
+    </li>
 
-    <li sec:authorize="hasAnyRole('LIBRARY', 'PRINCIPAL', 'TEACHER', 'STUDENT')" class="nav-item">
-      <a class="nav-link collapsed" href="#"><i class="bx bx-book me-2"></i> Library</a>
-    </li><!-- End Library Nav -->
-
+    <!-- ANNOUNCEMENTS -->
     <li class="nav-item">
-      <a class="nav-link collapsed" href="/announcements"><i class="bi bi-megaphone-fill me-2"></i> Announcements</a>
+      <a class="nav-link collapsed" th:href="@{/announcements}">
+        <i class="bi bi-megaphone-fill me-2"></i> Announcements</a>
     </li><!-- End Report Cards Nav -->
 
-    <li sec:authorize="hasAnyRole('ADMIN', 'PRINCIPAL')" class="nav-item">
-      <a class="nav-link collapsed" href="#"><i class="bi bi-arrow-left-right me-2"></i> Transfers</a>
-    </li><!-- End transfers Nav -->
-
-    <li th:if="${author.branch?.name == 'HQ'}" class="nav-item">
-      <a class="nav-link collapsed" href="/admin/administration"><i class="bi bi-diagram-3-fill me-2"></i> Administration</a>
-    </li><!-- End Accounts Nav -->
-
-    <li sec:authorize="hasRole('ADMIN')" class="nav-item">
-      <a class="nav-link collapsed" href="/admin/users"><i class="bi bi-shield-shaded me-2"></i> User Accounts</a>
-    </li><!-- End Accounts Nav -->
+    <!-- ATTENDANCE -->
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/attendance"><i class="bi bi-clock-fill me-2"></i> Staff Attendance</a>
+    </li><!-- End ATTENDANCE Nav -->
 
     <!-- SYSTEM -->
     <li class="nav-heading">System</li>
@@ -94,6 +191,7 @@
         <span>Log Out</span>
       </a>
     </li>
+
   </ul>
 
 </aside><!-- End Sidebar-->

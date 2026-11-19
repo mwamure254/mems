@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.mfano.mems.dtos.UserDto;
 import com.mfano.mems.auth.models.User;
+import com.mfano.mems.auth.models.Branch;
 import com.mfano.mems.auth.models.Role;
 import com.mfano.mems.auth.models.VerificationToken;
 import com.mfano.mems.auth.repositories.TokenRepository;
@@ -27,7 +28,6 @@ import jakarta.transaction.Transactional;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    // private final ProfileService profileService;
     private final BranchService branchService;
     private final RoleService roleService;
 
@@ -51,8 +51,25 @@ public class UserService {
         this.auditService = auditService;
     }
 
+    public List<User> findAll() {
+        return userRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    // Get User By Id
+    public User findById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public List<User> findByBranch(Branch school) {
+        return userRepository.findByBranch(school);
+    }
+
     @Transactional
-    public void registerUser(UserDto userDto, RedirectAttributes red) {
+    public void registerUser(Long auth, UserDto userDto, RedirectAttributes red) {
         if (userRepository.findByEmail(userDto.getEmail()) != null) {
             red.addFlashAttribute("error", "Email already in use");
         } else if (userDto.getRole() == null) {
@@ -72,7 +89,7 @@ public class UserService {
             userRepository.save(user);
             // createAndSendToken(user);
 
-            auditService.record(user.getBranch().getId(), "create_user", "success",
+            auditService.record(auth, "create_user", "success",
                     "Created user: " + userDto.getEmail());
             red.addFlashAttribute("message", "User created successfully!");
         }
@@ -83,7 +100,6 @@ public class UserService {
     }
 
     public void changePassword(CustomUserDetails auth, String password, RedirectAttributes red) {
-
         User user = findByEmail(auth.getUsername());
         if (user != null) {
             user.setPassword(passwordEncoder.encode(password));
@@ -94,7 +110,7 @@ public class UserService {
         }
     }
 
-    public void update(CustomUserDetails auth, Long id, UserDto userDto, RedirectAttributes red) {
+    public void update(Long auth, Long id, UserDto userDto, RedirectAttributes red) {
         User existing = findById(id);
 
         if (existing != null) {
@@ -110,7 +126,7 @@ public class UserService {
             existing.getRoles().add(roleService.findById(userDto.getRole()));
             userRepository.save(existing);
 
-            auditService.record(existing.getBranch().getId(), "update_user", "success",
+            auditService.record(auth, "update_user", "success",
                     "Created user: " + existing.getEmail());
             red.addFlashAttribute("message", "User updated successfully!");
         } else {
@@ -120,9 +136,10 @@ public class UserService {
     }
 
     public void deleteById(Long id, RedirectAttributes red) {
-        if (findById(id) != null) {
+        User existing = findById(id);
+        if (existing != null) {
             userRepository.deleteById(id);
-            auditService.record(findById(id).getBranch().getId(), "delete_user", "success", "Deleted user id = " + id);
+            auditService.record(existing.getBranch().getId(), "delete_user", "success", "Deleted user id = " + id);
             red.addFlashAttribute("message", "user successfully deleted");
         } else {
             red.addFlashAttribute("error", "User not found");
@@ -152,19 +169,6 @@ public class UserService {
                     "error",
                     "User not found.");
         }
-    }
-
-    // Get User By Id
-    public User findById(Long id) {
-        return userRepository.findById(id).orElse(null);
-    }
-
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
-
-    public User findByBranch_Id(Long storeId) {
-        return userRepository.findByBranch_Id(storeId);
     }
 
     public void createAndSendToken(User user, RedirectAttributes red) {
@@ -246,10 +250,6 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         tokenRepository.deleteByUserId(user.getId());
-    }
-
-    public List<User> findAll() {
-        return userRepository.findAll();
     }
 
     public void assignRoleToUser(Long userId, Long roleId, RedirectAttributes red) {

@@ -3,13 +3,11 @@ package com.mfano.mems.services;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.mfano.mems.auth.services.AuditService;
 import com.mfano.mems.models.Announcement;
 import com.mfano.mems.repositories.AnnouncementRepository;
-import com.mfano.mems.utils.documents.FileUpload;
 
 import lombok.RequiredArgsConstructor;
 
@@ -62,5 +60,45 @@ public class AnnouncementService {
         return announcementRepository.getAnnouncements(branch, id).stream()
                 .filter(entry -> entry.isActive() == true)// add filter logic
                 .toList();
+    }
+
+    public void toggleActive(Long id, RedirectAttributes redirectAttributes, Long branch) {
+        Announcement existing = findById(id);
+        if (existing != null) {
+            existing.setActive(!Boolean.TRUE.equals(existing.isActive()));
+            announcementRepository.save(existing);
+
+            if (existing.isActive() == true) {
+                auditService.record(branch, "toggle_role", "SUCCESS", "Activate Announcement " + existing.getName());
+                redirectAttributes.addFlashAttribute(
+                        "message",
+                        "Announcement activated successfully.");
+            } else {
+                auditService.record(branch, "toggle_announcement", "SUCCESS", "Deactivate announcement " + existing.getName());
+                redirectAttributes.addFlashAttribute(
+                        "message",
+                        "Announcement deactivated successfully.");
+            }
+        } else {
+            redirectAttributes.addFlashAttribute(
+                    "error",
+                    "Announcement not found.");
+        }
+    }
+
+    public void update(Long id, Announcement ann, RedirectAttributes redirectAttributes, Long branch) {
+         Announcement existing = findById(id);
+        if (existing != null) {
+            existing.setName(ann.getName());
+            existing.setDescription(ann.getDescription());
+            existing.setAudience(ann.getAudience());
+            existing.setUpload(ann.getUpload());
+
+            announcementRepository.save(ann);
+            auditService.record(branch, "UPDATE_ANNOUNCEMENT", "SUCCESS", "Updated announcement");
+            redirectAttributes.addFlashAttribute("message", "Announcement updated successfully.");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "No announcement found to update .");
+        }
     }
 }

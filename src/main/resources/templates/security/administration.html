@@ -96,8 +96,8 @@
                             </div>
                             <div class="mt-3 mt-md-0 d-flex flex-wrap">
                                 <!-- Export -->
-                                <div class="btn-group mr-2 mb-2">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                <div class="btn-group mb-2 mx-2">
+                                    <button type="button" class="btn btn-sm btn-outline-warning dropdown-toggle"
                                         data-bs-toggle="dropdown">
                                         <i class="bi bi-download bi-sm m-1"></i>Export
                                     </button>
@@ -115,26 +115,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Filter -->
-                                <div class="btn-group mr-2 mb-2 px-2">
-                                    <button type="button" class="btn btn-sm btn-outline-warning dropdown-toggle"
-                                        data-bs-toggle="dropdown">
-                                        <i class="bi bi-filter bi-sm m-1"></i>Filter
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-right shadow">
-                                        <h6 class="dropdown-header">Filter By Date</h6>
-                                        <a class="dropdown-item"
-                                            th:href="@{/records/documents(filter='today')}">Today</a>
-                                        <a class="dropdown-item" th:href="@{/records/documents(filter='month')}">This
-                                            Month</a>
-                                        <a class="dropdown-item" th:href="@{/records/documents(filter='year')}">This
-                                            Year</a>
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" th:href="@{/records/documents}">All Entries</a>
-                                    </div>
-                                </div>
-
-                                <button class="btn btn-outline-primary mr-2 mb-2" data-bs-toggle="modal"
+                                <button class="btn btn-outline-primary mb-2" data-bs-toggle="modal"
                                     data-bs-target="#addBranchModal">
                                     <i class="bi bi-plus-lg"></i> Add School
                                 </button>
@@ -167,7 +148,6 @@
                                             <div class="bg-primary-subtle
                                             text-primary d-flex align-items-center
                                             justify-content-center me-2">
-                                                <i class="bi bi-building"></i>
                                             </div>
 
                                             <span class="fw-semibold" th:text="${b.name}">
@@ -186,16 +166,15 @@
                                         <div th:if="${b.latitude != null and b.longitude != null}">
                                             <small class="text-muted d-block">
                                                 <i class="bi bi-geo-alt"></i>
-                                                <span th:text="${b.location}"></span>
+                                                <span th:text="${b.address}"></span>
                                             </small>
-                                            <a th:unless="${b.latitude == null and b.longitude == null}"
-                                                th:href="'https://www.google.com/maps?q='+${b.latitude}+','+${b.longitude}"
+                                            <a th:href="'https://www.google.com/maps?q='+${b.latitude}+','+${b.longitude}"
                                                 target="_blank" class="btn btn-sm btn-outline-success mt-1">
                                                 <i class="bi bi-map"></i> Map
                                             </a>
                                         </div>
                                         <span
-                                            th:unless="${b.latitude != null and b.longitude != null and b.location != null}"
+                                            th:if="${b.latitude == null and b.longitude == null and b.address == null}"
                                             class="text-muted small">No location</span>
                                     </td>
                                     <td th:text="${b.phone}">0700000000</td>
@@ -234,12 +213,12 @@
                                         </div>
                                     </td>
 
-                                    <!-- TOGGLE MODAL -->
+                                    <!-- TOGGLE SCHOOL -->
                                     <div class="modal fade" th:id="'toggleModal' + ${b.id}" tabindex="-1">
                                         <div class="modal-dialog modal-dialog-centered">
                                             <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">
+                                                <div class="modal-header border-0">
+                                                    <h5 class="modal-title fw-bold">
                                                         <span th:text="${b.active ? 'Deactivate' : 'Activate'}"></span>
                                                         School
                                                     </h5>
@@ -277,12 +256,12 @@
                                     </div>
                                     <!--END TOGGLE MODAL-->
 
-                                    <!-- DELETE MODAL -->
+                                    <!-- DELETE SCHOOL -->
                                     <div class="modal fade" th:id="'deleteModal' + ${b.id}" tabindex="-1">
                                         <div class="modal-dialog modal-dialog-centered">
                                             <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">
+                                                <div class="modal-header border-0">
+                                                    <h5 class="modal-title fw-bold">
                                                         Delete School
                                                     </h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal">
@@ -315,17 +294,18 @@
                                     </div>
                                     <!--END DELETE MODAL-->
 
-                                    <!--UPDATE MODAL-->
+                                    <!--UPDATE SCHOOL-->
                                     <div class="modal fade" th:id="'editModal' + ${b.id}" tabindex="-1"
                                         aria-hidden="true">
                                         <div class="modal-dialog modal-lg modal-dialog-centered">
                                             <div class="modal-content">
 
                                                 <form th:action="@{/admin/branches/update/{id}(id=${b.id})}"
-                                                    method="post">
+                                                    method="post" enctype="multipart/form-data"
+                                                    accept="application/pdf">
 
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="modal-title fw-bold">
                                                             <i class="bi bi-building-add"></i> Update School
                                                         </h5>
                                                         <button type="button" class="btn-close"
@@ -335,20 +315,55 @@
                                                     <div class="modal-body">
                                                         <div class="row g-3">
 
-                                                            <div class="col-md-8">
-                                                                <label class="form-label">Branch Name</label>
+                                                            <div class="col-md-6">
+                                                                <label class="form-label">School Name</label>
                                                                 <input type="text" name="name" th:value="${b.name}"
                                                                     class="form-control" placeholder="Main Branch"
                                                                     required>
                                                             </div>
 
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Branch Code</label>
+                                                            <div class="col-md-3">
+                                                                <label class="form-label">Level</label>
+
+                                                                <select class="form-control" name="type" required>
+                                                                    <option value="">SELECT</option>
+                                                                    <option value="NURSERY"
+                                                                        th:selected="${b.type == 'NURSERY'}">Nursery
+                                                                    </option>
+                                                                    <option value="PRIMARY"
+                                                                        th:selected="${b.type == 'PRIMARY'}">Primary
+                                                                    </option>
+                                                                    <option value="JUNIOR"
+                                                                        th:selected="${b.type == 'JUNIOR'}">Junior
+                                                                    </option>
+                                                                    <option value="SENIOR"
+                                                                        th:selected="${b.type == 'SENIOR'}">Senior
+                                                                    </option>
+                                                                    <option value="ELEMENTARY"
+                                                                        th:selected="${b.type == 'ELEMENTARY'}">
+                                                                        Elementary</option>
+                                                                    <option value="INTERNATIONAL"
+                                                                        th:selected="${b.type == 'INTERNATIONAL'}">
+                                                                        International</option>
+                                                                    <option value="SPECIAL"
+                                                                        th:selected="${b.type == 'SPECIAL'}">Special
+                                                                    </option>
+                                                                    <option value="VOCATIONAL"
+                                                                        th:selected="${b.type == 'VOCATIONAL'}">
+                                                                        Vocational</option>
+                                                                    <option value="COMPREHENSIVE"
+                                                                        th:selected="${b.type == 'COMPREHENSIVE'}">
+                                                                        Comprehensive</option>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="col-md-3">
+                                                                <label class="form-label">Code</label>
                                                                 <input type="text" name="code" th:value="${b.code}"
                                                                     class="form-control" placeholder="HQ" required>
                                                             </div>
 
-                                                            <div class="col-12">
+                                                            <div class="col-md-6">
                                                                 <label class="form-label">Email</label>
                                                                 <input type="email" name="email" th:value="${b.email}"
                                                                     class="form-control"
@@ -362,6 +377,21 @@
                                                                     required>
                                                             </div>
 
+                                                            <div class="col-md-6">
+                                                                <label class="form-label">Manager</label>
+                                                                <input type="text" name="manager"
+                                                                    th:value="${b.manager}" class="form-control"
+                                                                    placeholder="John Doe" required>
+                                                            </div>
+
+                                                            <!-- IMAGE -->
+                                                            <div class="col-md-6">
+                                                                <label class="form-label">
+                                                                    Agreement file
+                                                                </label>
+                                                                <input name="file" type="file" class="form-control">
+                                                            </div>
+
                                                             <div class="col-12">
                                                                 <hr>
                                                                 <h6><i class="bi bi-geo-alt-fill text-primary"></i>
@@ -370,33 +400,34 @@
 
                                                             <div class="col-md-12">
                                                                 <label class="form-label">Address</label>
-                                                                <input type="text" th:value="${b.location}"
-                                                                    class="form-control" placeholder="Nairobi" required>
+                                                                <input type="text" th:value="${b.address}"
+                                                                    name="address" class="form-control"
+                                                                    placeholder="Nairobi" required>
                                                             </div>
                                                             <div class="col-md-5">
                                                                 <label class="form-label">Latitude</label>
                                                                 <input type="number" step="any" th:value="${b.latitude}"
-                                                                    id="latNew" class="form-control"
-                                                                    placeholder="-3.2199" required>
+                                                                    th:id="'lat' + ${b.id}" class="form-control"
+                                                                    name="latitude" placeholder="-3.2199" required>
                                                             </div>
                                                             <div class="col-md-5">
                                                                 <label class="form-label">Longitude</label>
-                                                                <input type="number" step="any"
-                                                                    th:value="${b.longitude}" id="lngNew"
+                                                                <input type="number" step="any" name="longitude"
+                                                                    th:value="${b.longitude}" th:id="'lng' + ${b.id}"
                                                                     class="form-control" placeholder="40.1167" required>
                                                             </div>
                                                             <div class="col-md-2 d-flex align-items-end"><button
                                                                     type="button" class="btn btn-outline-primary w-100"
-                                                                    onclick="getLocation('New')"><i
+                                                                    th:onclick="'getLocation(\'' + ${b.id} + '\')'"><i
                                                                         class="bi bi-crosshair"></i> GPS</button></div>
                                                             <div class="col-12">
-                                                                <div id="mapNew"
+                                                                <div th:id="'map' + ${b.id}"
                                                                     style="height: 200px; border-radius: 8px;"></div>
                                                             </div>
                                                         </div>
                                                     </div>
 
-                                                    <div class="modal-footer">
+                                                    <div class="modal-footer border-0">
                                                         <button type="reset" class="btn btn-sm btn-warning">
                                                             Clear
                                                         </button>
@@ -440,17 +471,580 @@
             </div><!--END SCHOOL TAB-->
 
             <div class="tab-pane fade" id="grades">
+                <div class="card border-0">
+                    <!-- Card Header -->
+                    <div class="card-header py-3">
+                        <div class="d-flex flex-column flex-md-row align-items-md-start justify-content-between">
 
-                <h1 class="fw-bold mb-1">
-                    Branches2
-                </h1>
+                            <!-- SEARCH -->
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-search"></i>
+                                    </span>
+                                    <input type="text" id="gradeSearch" class="form-control"
+                                        onkeyup="searchTable('gradeSearch', 'gradeTable')"
+                                        placeholder="Search grades...">
+                                </div>
+                            </div>
+                            <div class="mt-3 mt-md-0 d-flex flex-wrap">
+                                <!-- Export -->
+                                <div class="btn-group mx-2 mb-2">
+                                    <button type="button" class="btn btn-sm btn-outline-warning dropdown-toggle"
+                                        data-bs-toggle="dropdown">
+                                        <i class="bi bi-download bi-sm m-1"></i>Export
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right shadow">
+                                        <h6 class="dropdown-header">Export Records</h6>
+                                        <a class="dropdown-item"
+                                            th:href="@{/records/documents/export/excel(filter=${filter})}"><i
+                                                class="bi bi-file-excel fa-sm fa-fw mr-2 text-success"></i>Excel</a>
+                                        <a class="dropdown-item"
+                                            th:href="@{/records/documents/export/pdf(filter=${filter})}"><i
+                                                class="bi bi-file-pdf fa-sm fa-fw mr-2 text-danger"></i>PDF</a>
+                                        <a class="dropdown-item"
+                                            th:href="@{/records/documents/export/word(filter=${filter})}"><i
+                                                class="bi bi-file-word fa-sm fa-fw mr-2 text-primary"></i>WORD</a>
+                                    </div>
+                                </div>
+
+                                <button class="btn btn-outline-primary mb-2" data-bs-toggle="modal"
+                                    data-bs-target="#addGrade">
+                                    <i class="bi bi-plus-lg"></i>
+                                    Add Grade
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ROLES TABLE -->
+                    <div class="table-responsive p-2">
+                        <table class="table table-hover align-middle mb-0" id="gradeTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>UIN</th>
+                                    <th>Status</th>
+                                    <th class="text-end" sec:authorize="hasRole('ADMIN')">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr th:each="g, stat : ${grades}">
+                                    <!-- ID -->
+                                    <td th:text="${stat.count}" th:id="'g-' + ${g.id}">
+                                        1
+                                    </td>
+                                    <!-- Grade -->
+                                    <td th:text="${g.name}">
+                                        Grade name
+                                    </td>
+
+                                    <!-- DESCRIPTION -->
+                                    <td th:text="${g.description}">
+                                        SKU001
+                                    </td>
+                                    <!-- CREATED BY -->
+                                    <td th:text="${g.reference}">
+                                        PERSON
+                                    </td>
+                                    <!-- STATUS -->
+                                    <td>
+                                        <span th:if="${g.active}" class="badge bg-success">
+                                            <i class="bi bi-check-circle"></i>
+                                            Active
+                                        </span>
+                                        <span th:unless="${g.active}" class="badge bg-secondary">
+                                            <i class="bi bi-x-circle"></i>
+                                            Inactive
+                                        </span>
+                                    </td>
+                                    <!-- ACTIONS -->
+                                    <td class="text-end" sec:authorize="hasAnyRole('ADMIN')">
+                                        <div class="btn-group">
+                                            <!-- EDIT -->
+                                            <a class="text-primary m-1" data-bs-toggle="modal"
+                                                th:data-bs-target="'#editGrade' + ${g.id}" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+
+                                            <a class="text-warning m-1" data-bs-toggle="modal"
+                                                th:data-bs-target="'#toggleGrade' + ${g.id}"
+                                                th:title="${g.active ? 'Deactivate' : 'Activate'}">
+                                                <i th:class="${g.active}
+                                            ? 'bi bi-toggle-on'
+                                            : 'bi bi-toggle-off'"></i>
+                                            </a>
+
+                                            <!-- DELETE -->
+                                            <a class="text-danger m-1" data-bs-toggle="modal"
+                                                th:data-bs-target="'#deleteGrade' + ${g.id}" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+
+                                        <!-- TOGGLE GRADE -->
+                                        <div class="modal fade" th:id="'toggleGrade' + ${g.id}" tabindex="-1">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="modal-title fw-bold">
+                                                            <span
+                                                                th:text="${g.active ? 'Deactivate' : 'Activate'}"></span>
+                                                            Grade
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body text-start">
+                                                        Are you sure you want to <span
+                                                            th:text="${g.active ? 'Deactivate ' : 'Activate '}"></span>
+                                                        <strong th:text="${g.name}">
+                                                            Role
+                                                        </strong>?
+                                                        <br>
+                                                        <small class="text-danger">
+                                                            This action can be undone at a fee.
+                                                        </small>
+                                                    </div>
+                                                    <div class="modal-footer border-0">
+                                                        <button type="button" class="btn btn-sm btn-secondary"
+                                                            data-bs-dismiss="modal">
+                                                            Cancel
+                                                        </button>
+                                                        <form th:action="@{/admin/grades/toggle/{id}(id=${g.id})}"
+                                                            method="post">
+                                                            <button type="submit" class="" th:class="${g.active}
+                                            ? 'btn btn-sm btn-danger'
+                                            : 'btn btn-sm btn-success'">
+                                                                <span th:text="${g.active ? 'Deactivate' : 'Activate'}">
+                                                                    Toggle <span>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--END TOGGLE MODAL-->
+
+                                        <!-- DELETE GRADE -->
+                                        <div class="modal fade" th:id="'deleteGrade' + ${g.id}" tabindex="-1">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="modal-title fw-bold">
+                                                            Delete grade
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body text-start">
+                                                        Are you sure you want to delete
+                                                        <strong th:text="${g.name}">
+                                                            Class
+                                                        </strong>?
+                                                        <br>
+                                                        <small class="text-danger">
+                                                            This action cannot be undone.
+                                                        </small>
+                                                    </div>
+                                                    <div class="modal-footer border-0">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">
+                                                            Cancel
+                                                        </button>
+                                                        <form th:action="@{/admin/grades/delete/{id}(id=${g.id})}"
+                                                            method="post">
+                                                            <button type="submit" class="btn btn-danger">
+                                                                Delete
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--END DELETE MODAL-->
+                                    </td>
+
+                                    <!-- EDIT GRADE -->
+                                    <div class="modal fade" th:id="'editGrade' + ${g.id}" tabindex="-1"
+                                        aria-hidden="true">
+                                        <div class="modal-dialog modal-md modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <form th:action="@{/admin/grades/update/{id}(id=${g.id})}"
+                                                    method="post">
+                                                    <!-- HEADER -->
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="modal-title fw-bold">
+                                                            <i class="bi bi-pencil-square"></i>
+                                                            Edit Grade
+                                                        </h5>
+
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                        </button>
+                                                    </div>
+
+                                                    <!-- BODY -->
+                                                    <div class="modal-body">
+                                                        <div class="row g-3">
+                                                            <!-- NAME -->
+                                                            <div class="col-md-12">
+                                                                <label class="form-label">
+                                                                    Grade Name
+                                                                </label>
+                                                                <input type="text" class="form-control" name="entyName"
+                                                                    placeholder="Role name" th:value="${g.name}"
+                                                                    required>
+                                                            </div>
+
+                                                            <!-- DESCRIPTION -->
+                                                            <div class="col-md-12">
+                                                                <label class="form-label">
+                                                                    Description
+                                                                </label>
+                                                                <textarea rows="3" maxlength="200" class="form-control"
+                                                                    name="entyName" placeholder="Description" required
+                                                                    th:text="${g.description}"></textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- FOOTER -->
+                                                    <div class="modal-footer border-0">
+                                                        <button type="reset" class="btn btn-warning">
+                                                            Clear
+                                                        </button>
+
+                                                        <button type="submit" class="btn btn-primary">
+                                                            <i class="bi bi-save"></i>
+                                                            Update
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </tr>
+
+                                <!-- EMPTY -->
+                                <tr th:if="${#lists.isEmpty(grades)}">
+                                    <td colspan="6" class="text-center py-5">
+                                        <h5 class="mt-3">
+                                            No grade found
+                                        </h5>
+                                        <p class="text-muted">
+                                            Add your first grade to get started.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Card Footer -->
+                    <div class="card-footer bg-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Records are maintained for security and accountability.
+                            </small>
+                            <span class="badge bg-secondary" th:if="${grades != null}"
+                                th:text="${#lists.size(grades) + ' Entries'}">0 Entries</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="tab-pane fade" id="terms">
+                <div class="card border-0">
+                    <!-- Card Header -->
+                    <div class="card-header py-3">
+                        <div class="d-flex flex-column flex-md-row align-items-md-start justify-content-between">
 
-                <h1 class="fw-bold mb-1">
-                    Branches3
-                </h1>
+                            <!-- SEARCH -->
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-search"></i>
+                                    </span>
+                                    <input type="text" id="termSearch" class="form-control"
+                                        onkeyup="searchTable('termSearch', 'termTable')"
+                                        placeholder="Search sesions...">
+                                </div>
+                            </div>
+                            <div class="mt-3 mt-md-0 d-flex flex-wrap">
+                                <!-- Export -->
+                                <div class="btn-group mx-2 mb-2">
+                                    <button type="button" class="btn btn-sm btn-outline-warning dropdown-toggle"
+                                        data-bs-toggle="dropdown">
+                                        <i class="bi bi-download bi-sm m-1"></i>Export
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right shadow">
+                                        <h6 class="dropdown-header">Export Records</h6>
+                                        <a class="dropdown-item"
+                                            th:href="@{/records/documents/export/excel(filter=${filter})}"><i
+                                                class="bi bi-file-excel fa-sm fa-fw mr-2 text-success"></i>Excel</a>
+                                        <a class="dropdown-item"
+                                            th:href="@{/records/documents/export/pdf(filter=${filter})}"><i
+                                                class="bi bi-file-pdf fa-sm fa-fw mr-2 text-danger"></i>PDF</a>
+                                        <a class="dropdown-item"
+                                            th:href="@{/records/documents/export/word(filter=${filter})}"><i
+                                                class="bi bi-file-word fa-sm fa-fw mr-2 text-primary"></i>WORD</a>
+                                    </div>
+                                </div>
+
+                                <button class="btn btn-outline-primary mr-2 mb-2" data-bs-toggle="modal"
+                                    data-bs-target="#addTerm">
+                                    <i class="bi bi-plus-lg"></i>
+                                    Add Session
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUBJECTS' TABLE -->
+                    <div class="table-responsive p-2">
+                        <table class="table table-hover mb-0" id="termTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>TERM</th>
+                                    <th>YEAR</th>
+                                    <th>UIN</th>
+                                    <th>STATUS</th>
+                                    <th class="text-end">ACTION</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr th:each="term, stat : ${terms}">
+                                    <td th:text="${stat.count}" th:id="'t-' + ${term.id}">#</td>
+                                    <td class=" fw-semibold" th:text="${term.t}">1</td>
+                                    <td th:text="${term.y}">0002</td>
+                                    <td th:text="${term.reference}"># 1</td>
+                                    <!-- STATUS -->
+                                    <td>
+                                        <span th:if="${term.active}" class="badge bg-success">
+                                            <i class="bi bi-check-circle"></i>
+                                            Active
+                                        </span>
+                                        <span th:unless="${term.active}" class="badge bg-secondary">
+                                            <i class="bi bi-x-circle"></i>
+                                            Inactive
+                                        </span>
+                                    </td>
+                                    <!-- ACTIONS -->
+                                    <td class="text-end" sec:authorize="hasAnyRole('ADMIN')">
+                                        <div class="btn-group">
+                                            <!-- EDIT -->
+                                            <a class="text-primary m-1" data-bs-toggle="modal"
+                                                th:data-bs-target="'#editSubject' + ${term.id}" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+
+                                            <a class="text-warning m-1" data-bs-toggle="modal"
+                                                th:data-bs-target="'#toggleTerm' + ${term.id}"
+                                                th:title="${term.active ? 'Deactivate' : 'Activate'}">
+                                                <i th:class="${term.active}
+                                            ? 'bi bi-toggle-on'
+                                            : 'bi bi-toggle-off'"></i>
+                                            </a>
+
+                                            <!-- DELETE -->
+                                            <a class="text-danger m-1" data-bs-toggle="modal"
+                                                th:data-bs-target="'#deleteTerm' + ${term.id}" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+
+                                        <!-- TOGGLE ROLE -->
+                                        <div class="modal fade" th:id="'toggleTerm' + ${term.id}" tabindex="-1">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="modal-title fw-bold">
+                                                            <span
+                                                                th:text="${term.active ? 'Deactivate' : 'Activate'}"></span>
+                                                            Session
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body text-start">
+                                                        Are you sure you want to <span
+                                                            th:text="${term.active ? 'Deactivate ' : 'Activate '}"></span>
+                                                        <strong th:text="${term.t + ', ' + term.y}">
+                                                            Session
+                                                        </strong>?
+                                                        <br>
+                                                        <small class="text-danger">
+                                                            This action can be undone at a fee.
+                                                        </small>
+                                                    </div>
+                                                    <div class="modal-footer border-0">
+                                                        <button type="button" class="btn btn-sm btn-secondary"
+                                                            data-bs-dismiss="modal">
+                                                            Cancel
+                                                        </button>
+                                                        <form th:action="@{/admin/terms/toggle/{id}(id=${term.id})}"
+                                                            method="post">
+                                                            <button type="submit" class="" th:class="${term.active}
+                                            ? 'btn btn-sm btn-danger'
+                                            : 'btn btn-sm btn-success'">
+                                                                <span
+                                                                    th:text="${term.active ? 'Deactivate' : 'Activate'}">
+                                                                    Toggle <span>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--END TOGGLE MODAL-->
+
+                                        <!-- DELETE SESSION -->
+                                        <div class="modal fade" th:id="'deleteTerm' + ${term.id}" tabindex="-1">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="modal-title fw-bold">
+                                                            Delete Session
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body text-start">
+                                                        Are you sure you want to delete term
+                                                        <strong th:text="${term.t + ', ' + term.y}">
+                                                            Session
+                                                        </strong>?
+                                                        <br>
+                                                        <small class="text-danger">
+                                                            This action cannot be undone.
+                                                        </small>
+                                                    </div>
+                                                    <div class="modal-footer border-0">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">
+                                                            Cancel
+                                                        </button>
+                                                        <form th:action="@{/admin/terms/delete/{id}(id=${term.id})}"
+                                                            method="post">
+                                                            <button type="submit" class="btn btn-danger">
+                                                                Delete
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--END DELETE MODAL-->
+                                    </td>
+
+                                    <!-- EDIT SESSION -->
+                                    <div class="modal fade" th:id="'editTerm' + ${term.id}" tabindex="-1"
+                                        aria-hidden="true">
+                                        <div class="modal-dialog modal-md modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <form th:action="@{/admin/terms/update/{id}(id=${term.id})}"
+                                                    method="post">
+                                                    <!-- HEADER -->
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="modal-title fw-bold">
+                                                            <i class="bi bi-pencil-square"></i>
+                                                            Edit Session
+                                                        </h5>
+
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                        </button>
+                                                    </div>
+
+                                                    <!-- BODY -->
+                                                    <div class="modal-body">
+                                                        <div class="row g-3">
+                                                            <!-- TERM -->
+                                                            <div class="col-md-6">
+                                                                <label class="form-label">
+                                                                    Term
+                                                                </label>
+                                                                <select name="t" class="form-select" required>
+                                                                    <option value="1" th:selected="${term.t == '1'}">
+                                                                        Term 1</option>
+                                                                    <option value="2" th:selected="${term.t == '2'}">
+                                                                        Term 2</option>
+                                                                    <option value="3" th:selected="${term.t == '3'}">
+                                                                        Term 3</option>
+                                                                </select>
+                                                            </div>
+                                                            <!-- YEAR -->
+                                                            <div class="col-md-6">
+                                                                <label class="form-label">
+                                                                    Year
+                                                                </label>
+                                                                <input type="number" class="form-control" name="y"
+                                                                    placeholder="Year" th:value="${term.y}" required>
+                                                            </div>
+
+                                                            <!-- COMMENT -->
+                                                            <div class="col-md-12">
+                                                                <label class="form-label">
+                                                                    Comments
+                                                                </label>
+                                                                <textarea rows="3" maxlength="200" class="form-control"
+                                                                    name="comments" placeholder="Comment" required
+                                                                    th:text="${term.comments}"></textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- FOOTER -->
+                                                    <div class="modal-footer border-0">
+                                                        <button type="reset" class="btn btn-warning">
+                                                            Clear
+                                                        </button>
+
+                                                        <button type="submit" class="btn btn-primary">
+                                                            <i class="bi bi-save"></i>
+                                                            Update
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </tr>
+
+                                <!-- EMPTY -->
+                                <tr th:if="${#lists.isEmpty(terms)}">
+                                    <td colspan="6" class="text-center py-5">
+                                        <h5 class="mt-3">
+                                            No session found
+                                        </h5>
+                                        <p class="text-muted">
+                                            Add your first session to get started.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Card Footer -->
+                    <div class="card-footer bg-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Records are maintained for security and accountability.
+                            </small>
+                            <span class="badge bg-secondary" th:if="${terms != null}"
+                                th:text="${#lists.size(terms) + ' Entries'}">0 Entries</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="tab-pane fade" id="roles">
@@ -471,10 +1065,10 @@
                             </div>
                             <div class="mt-3 mt-md-0 d-flex flex-wrap">
                                 <!-- Export -->
-                                <div class="btn-group mr-2 mb-2">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                <div class="btn-group mx-2 mb-2">
+                                    <button type="button" class="btn btn-sm btn-outline-warning dropdown-toggle"
                                         data-bs-toggle="dropdown">
-                                        <i class="bi bi-download bi-sm mr-1"></i>Export
+                                        <i class="bi bi-download bi-sm m-1"></i>Export
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-right shadow">
                                         <h6 class="dropdown-header">Export Records</h6>
@@ -490,27 +1084,8 @@
                                     </div>
                                 </div>
 
-                                <!-- Filter -->
-                                <div class="btn-group mr-2 mb-2 px-2">
-                                    <button type="button" class="btn btn-sm btn-outline-warning dropdown-toggle"
-                                        data-bs-toggle="dropdown">
-                                        <i class="bi bi-filter bi-sm mr-1"></i>Filter
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-right shadow">
-                                        <h6 class="dropdown-header">Filter By Date</h6>
-                                        <a class="dropdown-item"
-                                            th:href="@{/records/documents(filter='today')}">Today</a>
-                                        <a class="dropdown-item" th:href="@{/records/documents(filter='month')}">This
-                                            Month</a>
-                                        <a class="dropdown-item" th:href="@{/records/documents(filter='year')}">This
-                                            Year</a>
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" th:href="@{/records/documents}">All Entries</a>
-                                    </div>
-                                </div>
-
                                 <button class="btn btn-outline-primary mr-2 mb-2" data-bs-toggle="modal"
-                                    data-bs-target="#addModal">
+                                    data-bs-target="#addRole">
                                     <i class="bi bi-plus-lg"></i>
                                     Add Role
                                 </button>
@@ -524,9 +1099,9 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>#</th>
-                                    <th>Role</th>
+                                    <th>Name</th>
                                     <th>Description</th>
-                                    <th>Created By</th>
+                                    <th>UIN</th>
                                     <th>Status</th>
                                     <th class="text-end" sec:authorize="hasRole('ADMIN')">
                                         Actions
@@ -550,7 +1125,7 @@
                                         SKU001
                                     </td>
                                     <!-- CREATED BY -->
-                                    <td th:text="${r.createdBy}">
+                                    <td th:text="${r.reference}">
                                         PERSON
                                     </td>
                                     <!-- STATUS -->
@@ -568,37 +1143,76 @@
                                     <td class="text-end" sec:authorize="hasAnyRole('ADMIN')">
                                         <div class="btn-group">
                                             <!-- EDIT -->
-                                            <button type="button" class="btn btn-sm btn-outline-primary"
-                                                data-bs-toggle="modal" th:data-bs-target="'#editModal' + ${r.id}"
-                                                title="Edit">
-
+                                            <a class="text-primary m-1" data-bs-toggle="modal"
+                                                th:data-bs-target="'#editRole' + ${r.id}" title="Edit">
                                                 <i class="bi bi-pencil"></i>
-                                            </button>
-                                            <!-- TOGGLE -->
-                                            <form th:action="@{/admin/roles/toggle/{id}(id=${r.id})}" method="post"
-                                                class="d-inline">
-                                                <button type="submit" class="btn btn-sm btn-outline-warning" th:title="${r.active}
-                                            ? 'Deactivate'
-                                            : 'Activate'">
-                                                    <i th:class="${r.active}
-                                        ? 'bi bi-toggle-on'
-                                        : 'bi bi-toggle-off'">
-                                                    </i>
-                                                </button>
-                                            </form>
+                                            </a>
+
+                                            <a class="text-warning m-1" data-bs-toggle="modal"
+                                                th:data-bs-target="'#toggleRole' + ${r.id}"
+                                                th:title="${r.active ? 'Deactivate' : 'Activate'}">
+                                                <i th:class="${r.active}
+                                            ? 'bi bi-toggle-on'
+                                            : 'bi bi-toggle-off'"></i>
+                                            </a>
+
                                             <!-- DELETE -->
-                                            <a class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
-                                                th:data-bs-target="'#deleteModal' + ${r.id}" title="Delete">
+                                            <a class="text-danger m-1" data-bs-toggle="modal"
+                                                th:data-bs-target="'#deleteRole' + ${r.id}" title="Delete">
                                                 <i class="bi bi-trash"></i>
                                             </a>
                                         </div>
 
-                                        <!-- DELETE MODAL -->
-                                        <div class="modal fade" th:id="'deleteModal' + ${r.id}" tabindex="-1">
+                                        <!-- TOGGLE ROLE -->
+                                        <div class="modal fade" th:id="'toggleRole' + ${r.id}" tabindex="-1">
                                             <div class="modal-dialog modal-dialog-centered">
                                                 <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="modal-title fw-bold">
+                                                            <span
+                                                                th:text="${r.active ? 'Deactivate' : 'Activate'}"></span>
+                                                            Role
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body text-start">
+                                                        Are you sure you want to <span
+                                                            th:text="${r.active ? 'Deactivate ' : 'Activate '}"></span>
+                                                        <strong th:text="${r.name}">
+                                                            Role
+                                                        </strong>?
+                                                        <br>
+                                                        <small class="text-danger">
+                                                            This action can be undone at a fee.
+                                                        </small>
+                                                    </div>
+                                                    <div class="modal-footer border-0">
+                                                        <button type="button" class="btn btn-sm btn-secondary"
+                                                            data-bs-dismiss="modal">
+                                                            Cancel
+                                                        </button>
+                                                        <form th:action="@{/admin/roles/toggle/{id}(id=${r.id})}"
+                                                            method="post">
+                                                            <button type="submit" class="" th:class="${r.active}
+                                            ? 'btn btn-sm btn-danger'
+                                            : 'btn btn-sm btn-success'">
+                                                                <span th:text="${r.active ? 'Deactivate' : 'Activate'}">
+                                                                    Toggle <span>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--END TOGGLE MODAL-->
+
+                                        <!-- DELETE ROLE -->
+                                        <div class="modal fade" th:id="'deleteRole' + ${r.id}" tabindex="-1">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="modal-title fw-bold">
                                                             Delete role
                                                         </h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal">
@@ -614,7 +1228,7 @@
                                                             This action cannot be undone.
                                                         </small>
                                                     </div>
-                                                    <div class="modal-footer">
+                                                    <div class="modal-footer border-0">
                                                         <button type="button" class="btn btn-secondary"
                                                             data-bs-dismiss="modal">
                                                             Cancel
@@ -622,7 +1236,6 @@
                                                         <form th:action="@{/admin/roles/delete/{id}(id=${r.id})}"
                                                             method="post">
                                                             <button type="submit" class="btn btn-danger">
-                                                                <i class="bi bi-trash"></i>
                                                                 Delete
                                                             </button>
                                                         </form>
@@ -633,15 +1246,15 @@
                                         <!--END DELETE MODAL-->
                                     </td>
 
-                                    <!-- EDIT ROLE MODAL -->
-                                    <div class="modal fade" th:id="'editModal' + ${r.id}" tabindex="-1"
+                                    <!-- EDIT ROLE -->
+                                    <div class="modal fade" th:id="'editRole' + ${r.id}" tabindex="-1"
                                         aria-hidden="true">
                                         <div class="modal-dialog modal-md modal-dialog-centered">
                                             <div class="modal-content">
                                                 <form th:action="@{/admin/roles/update/{id}(id=${r.id})}" method="post">
                                                     <!-- HEADER -->
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="modal-title fw-bold">
                                                             <i class="bi bi-pencil-square"></i>
                                                             Edit Role
                                                         </h5>
@@ -658,7 +1271,7 @@
                                                                 <label class="form-label">
                                                                     Role Name
                                                                 </label>
-                                                                <input type="text" class="form-control" name="name"
+                                                                <input type="text" class="form-control" name="entyName"
                                                                     placeholder="Role name" th:value="${r.name}"
                                                                     required>
                                                             </div>
@@ -669,16 +1282,15 @@
                                                                     Description
                                                                 </label>
                                                                 <textarea rows="3" maxlength="200" class="form-control"
-                                                                    name="description" placeholder="Description"
-                                                                    required th:text="${r.description}"></textarea>
+                                                                    name="entyDesc" placeholder="Description" required
+                                                                    th:text="${r.description}"></textarea>
                                                             </div>
                                                         </div>
                                                     </div>
 
                                                     <!-- FOOTER -->
-                                                    <div class="modal-footer">
-                                                        <button type="reset" class="btn btn-warning"
-                                                            data-bs-dismiss="modal">
+                                                    <div class="modal-footer border-0">
+                                                        <button type="reset" class="btn btn-warning">
                                                             Clear
                                                         </button>
 
@@ -695,8 +1307,7 @@
 
                                 <!-- EMPTY -->
                                 <tr th:if="${#lists.isEmpty(roles)}">
-                                    <td colspan="7" class="text-center py-5">
-                                        <i class="bi bi-person-badge fs-1 text-muted"></i>
+                                    <td colspan="6" class="text-center py-5">
                                         <h5 class="mt-3">
                                             No Roles found
                                         </h5>
@@ -724,51 +1335,439 @@
             </div>
 
             <div class="tab-pane fade" id="subjects">
+                <div class="card border-0">
+                    <!-- Card Header -->
+                    <div class="card-header py-3">
+                        <div class="d-flex flex-column flex-md-row align-items-md-start justify-content-between">
 
-                <h1 class="fw-bold mb-1">
-                    Branches5
-                </h1>
+                            <!-- SEARCH -->
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-search"></i>
+                                    </span>
+                                    <input type="text" id="subjectSearch" class="form-control"
+                                        onkeyup="searchTable('subjectSearch', 'subjectTable')"
+                                        placeholder="Search subjects...">
+                                </div>
+                            </div>
+                            <div class="mt-3 mt-md-0 d-flex flex-wrap">
+                                <!-- Export -->
+                                <div class="btn-group mx-2 mb-2">
+                                    <button type="button" class="btn btn-sm btn-outline-warning dropdown-toggle"
+                                        data-bs-toggle="dropdown">
+                                        <i class="bi bi-download bi-sm m-1"></i>Export
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right shadow">
+                                        <h6 class="dropdown-header">Export Records</h6>
+                                        <a class="dropdown-item"
+                                            th:href="@{/records/documents/export/excel(filter=${filter})}"><i
+                                                class="bi bi-file-excel fa-sm fa-fw mr-2 text-success"></i>Excel</a>
+                                        <a class="dropdown-item"
+                                            th:href="@{/records/documents/export/pdf(filter=${filter})}"><i
+                                                class="bi bi-file-pdf fa-sm fa-fw mr-2 text-danger"></i>PDF</a>
+                                        <a class="dropdown-item"
+                                            th:href="@{/records/documents/export/word(filter=${filter})}"><i
+                                                class="bi bi-file-word fa-sm fa-fw mr-2 text-primary"></i>WORD</a>
+                                    </div>
+                                </div>
+
+                                <button class="btn btn-outline-primary mr-2 mb-2" data-bs-toggle="modal"
+                                    data-bs-target="#addSubject">
+                                    <i class="bi bi-plus-lg"></i>
+                                    Add Subject
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUBJECTS' TABLE -->
+                    <div class="table-responsive p-2">
+                        <table class="table table-hover mb-0" id="subjectTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>SUBJECT</th>
+                                    <th>CODE</th>
+                                    <th>UIN</th>
+                                    <th>STATUS</th>
+                                    <th class="text-end">ACTION</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr th:each="s, stat : ${subjects}">
+                                    <td th:text="${stat.count}" th:id="'s-' + ${s.id}">#</td>
+                                    <td class=" fw-semibold text-uppercase" th:text="${s.name}">ENGLISH</td>
+                                    <td th:text="${s.code}">0002</td>
+                                    <td th:text="${s.reference}">Grade 1</td>
+                                    <!-- STATUS -->
+                                    <td>
+                                        <span th:if="${s.active}" class="badge bg-success">
+                                            <i class="bi bi-check-circle"></i>
+                                            Active
+                                        </span>
+                                        <span th:unless="${s.active}" class="badge bg-secondary">
+                                            <i class="bi bi-x-circle"></i>
+                                            Inactive
+                                        </span>
+                                    </td>
+                                    <!-- ACTIONS -->
+                                    <td class="text-end" sec:authorize="hasAnyRole('ADMIN')">
+                                        <div class="btn-group">
+                                            <!-- EDIT -->
+                                            <a class="text-primary m-1" data-bs-toggle="modal"
+                                                th:data-bs-target="'#editSubject' + ${s.id}" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+
+                                            <a class="text-warning m-1" data-bs-toggle="modal"
+                                                th:data-bs-target="'#toggleSubject' + ${s.id}"
+                                                th:title="${s.active ? 'Deactivate' : 'Activate'}">
+                                                <i th:class="${s.active}
+                                            ? 'bi bi-toggle-on'
+                                            : 'bi bi-toggle-off'"></i>
+                                            </a>
+
+                                            <!-- DELETE -->
+                                            <a class="text-danger m-1" data-bs-toggle="modal"
+                                                th:data-bs-target="'#deleteSubject' + ${s.id}" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+
+                                        <!-- TOGGLE ROLE -->
+                                        <div class="modal fade" th:id="'toggleSubject' + ${s.id}" tabindex="-1">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="modal-title fw-bold">
+                                                            <span
+                                                                th:text="${s.active ? 'Deactivate' : 'Activate'}"></span>
+                                                            Subject
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body text-start">
+                                                        Are you sure you want to <span
+                                                            th:text="${s.active ? 'Deactivate ' : 'Activate '}"></span>
+                                                        <strong th:text="${s.name}">
+                                                            Subject
+                                                        </strong>?
+                                                        <br>
+                                                        <small class="text-danger">
+                                                            This action can be undone at a fee.
+                                                        </small>
+                                                    </div>
+                                                    <div class="modal-footer border-0">
+                                                        <button type="button" class="btn btn-sm btn-secondary"
+                                                            data-bs-dismiss="modal">
+                                                            Cancel
+                                                        </button>
+                                                        <form th:action="@{/admin/subjects/toggle/{id}(id=${s.id})}"
+                                                            method="post">
+                                                            <button type="submit" class="" th:class="${s.active}
+                                            ? 'btn btn-sm btn-danger'
+                                            : 'btn btn-sm btn-success'">
+                                                                <span th:text="${s.active ? 'Deactivate' : 'Activate'}">
+                                                                    Toggle <span>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--END TOGGLE MODAL-->
+
+                                        <!-- DELETE SUBJECT -->
+                                        <div class="modal fade" th:id="'deleteSubject' + ${s.id}" tabindex="-1">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="modal-title fw-bold">
+                                                            Delete subject
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body text-start">
+                                                        Are you sure you want to delete
+                                                        <strong th:text="${s.name}">
+                                                            Subject
+                                                        </strong>?
+                                                        <br>
+                                                        <small class="text-danger">
+                                                            This action cannot be undone.
+                                                        </small>
+                                                    </div>
+                                                    <div class="modal-footer border-0">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">
+                                                            Cancel
+                                                        </button>
+                                                        <form th:action="@{/admin/subjects/delete/{id}(id=${s.id})}"
+                                                            method="post">
+                                                            <button type="submit" class="btn btn-danger">
+                                                                Delete
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--END DELETE MODAL-->
+                                    </td>
+
+                                    <!-- EDIT SUBJECT -->
+                                    <div class="modal fade" th:id="'editSubject' + ${s.id}" tabindex="-1"
+                                        aria-hidden="true">
+                                        <div class="modal-dialog modal-md modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <form th:action="@{/admin/subjects/update/{id}(id=${s.id})}"
+                                                    method="post">
+                                                    <!-- HEADER -->
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="modal-title fw-bold">
+                                                            <i class="bi bi-pencil-square"></i>
+                                                            Edit Subject
+                                                        </h5>
+
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                        </button>
+                                                    </div>
+
+                                                    <!-- BODY -->
+                                                    <div class="modal-body">
+                                                        <div class="row g-3">
+                                                            <!-- NAME -->
+                                                            <div class="col-md-6">
+                                                                <label class="form-label">
+                                                                    Subject Name
+                                                                </label>
+                                                                <input type="text" class="form-control" name="name"
+                                                                    placeholder="Role name" th:value="${s.name}"
+                                                                    required>
+                                                            </div>
+                                                            <!-- CODE -->
+                                                            <div class="col-md-6">
+                                                                <label class="form-label">
+                                                                    Subject code
+                                                                </label>
+                                                                <input type="text" class="form-control" name="code"
+                                                                    placeholder="Role name" th:value="${s.code}"
+                                                                    required>
+                                                            </div>
+
+                                                            <!-- DESCRIPTION -->
+                                                            <div class="col-md-12">
+                                                                <label class="form-label">
+                                                                    Description
+                                                                </label>
+                                                                <textarea rows="3" maxlength="200" class="form-control"
+                                                                    name="description" placeholder="Description"
+                                                                    required th:text="${s.description}"></textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- FOOTER -->
+                                                    <div class="modal-footer border-0">
+                                                        <button type="reset" class="btn btn-warning">
+                                                            Clear
+                                                        </button>
+
+                                                        <button type="submit" class="btn btn-primary">
+                                                            <i class="bi bi-save"></i>
+                                                            Update
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </tr>
+
+                                <!-- EMPTY -->
+                                <tr th:if="${#lists.isEmpty(subjects)}">
+                                    <td colspan="6" class="text-center py-5">
+                                        <h5 class="mt-3">
+                                            No learning area found
+                                        </h5>
+                                        <p class="text-muted">
+                                            Add your first subject to get started.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Card Footer -->
+                    <div class="card-footer bg-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Records are maintained for security and accountability.
+                            </small>
+                            <span class="badge bg-secondary" th:if="${subjects != null}"
+                                th:text="${#lists.size(subjects) + ' Entries'}">0 Entries</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div><!-- End Bordered Tab Content -->
     </main><!-- End #main -->
 
-    <!--COMMON ADD ENTITY MODAL -->
-    <div class="modal fade" id="addModal" tabindex="-1">
+    <!-- ADD TERMS MODAL -->
+    <div class="modal fade" id="addTerm" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form th:action="@{/admin/terms/save}" method="post">
+                <div class="modal-content">
+                    <!-- HEADER -->
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title fw-bold">Add Session</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <!-- BODY -->
+                    <div class="modal-body">
+                        <div class="row">
+                            <!-- SESSION/ TERM -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Session*</label>
+                                <select name="t" class="form-select" required>
+                                    <option value="">SELECT</option>
+                                    <option value="1">
+                                        Term 1</option>
+                                    <option value="2">
+                                        Term 2</option>
+                                    <option value="3">
+                                        Term 3</option>
+                                </select>
+                            </div>
+
+                            <!-- YEAR -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Year*</label>
+                                <input type="number" name="y" id="termY" class="form-control"
+                                    placeholder="Year eg. #2010" required>
+                            </div>
+
+                            <!-- COMMENT -->
+                            <div class="mb-3">
+                                <label class="form-label">Message *</label>
+                                <textarea name="comments" class="form-control" rows="4"
+                                    placeholder="Comment on the session" maxlength="200" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-sm btn-warning">
+                            Clear
+                        </button>
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="bi bi-save"></i>
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div><!--END SESSION MODAL-->
+
+    <!-- ADD SUBJECT MODAL -->
+    <div class="modal fade" id="addSubject" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form th:action="@{/admin/subjects/save}" method="post">
+                <div class="modal-content">
+                    <!-- HEADER -->
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title fw-bold">Add subject</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <!-- BODY -->
+                    <div class="modal-body">
+                        <div class="row">
+                            <!-- SUBJECT / LEARNING AREA -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Learning area*</label>
+                                <input type="text" name="name" id="subName" class="form-control"
+                                    placeholder="Subject name" required>
+                            </div>
+
+                            <!-- CODE -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Code*</label>
+                                <input type="text" name="code" id="subCode" class="form-control"
+                                    placeholder="Code eg. 200" required>
+                            </div>
+
+                            <!-- DESCRIPTION -->
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea name="description" id="annMessage" class="form-control" rows="4"
+                                    placeholder="Description of the subject" maxlength="200" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-sm btn-warning">
+                            Clear
+                        </button>
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="bi bi-save"></i>
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div><!--END SUBJECT MODAL-->
+
+    <!--ADD GRADE MODAL -->
+    <div class="modal fade" id="addGrade" tabindex="-1">
         <div class="modal-dialog modal-md modal-dialog-centered">
             <div class="modal-content">
-                <form th:action="@{/admin/roles/save}" method="post">
-                    <div class="modal-header">
-                        <h5 class="modal-title">
+                <form th:action="@{/admin/grades/save}" method="post">
+                    <div class="modal-header border">
+                        <h5 class="modal-title fw-bold">
                             <i class="bi bi-plus-circle"></i>
-                            Add <span>Entity</span>
+                            Add Grade
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal">
                         </button>
                     </div>
 
                     <div class="modal-body">
+                        <input type="hidden" name="entity" id="ent">
+
                         <div class="row g-3">
                             <!-- NAME -->
                             <div class="col-md-12">
                                 <label class="form-label">
-                                    <span>Entity</span> Name
+                                    Name
                                 </label>
-                                <input type="text" name="name" class="form-control" placeholder="Role name" required>
+                                <input type="text" name="entyName" class="form-control" placeholder="Grade name"
+                                    required>
                             </div>
-                            <!-- SKU -->
-                            <div class="col-md-12">
-                                <label class="form-label">
-                                    Description
-                                </label>
-                                <textarea rows="3" maxlength="200" name="description" class="form-control"
-                                    placeholder="Description of the role" required>
-                                        </textarea>
+
+                            <!-- DESCRIPTION -->
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea name="entyDesc" class="form-control" rows="4"
+                                    placeholder="Description of the grade" required></textarea>
                             </div>
                         </div>
                     </div>
 
-                    <div class="modal-footer">
+                    <div class="modal-footer border-0">
                         <button type="button" class="btn btn-sm btn-warning">
                             Clear
                         </button>
@@ -780,17 +1779,66 @@
                 </form>
             </div>
         </div>
-    </div><!--END COMMON MODAL-->
+    </div><!--END GRADE MODAL-->
+
+    <!--ADD ROLE MODAL -->
+    <div class="modal fade" id="addRole" tabindex="-1">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content">
+                <form th:action="@{/admin/roles/save}" method="post">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title fw-bold">
+                            <i class="bi bi-plus-circle"></i>
+                            Add Role
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <!-- NAME -->
+                            <div class="col-md-12">
+                                <label class="form-label">
+                                    Name
+                                </label>
+                                <input type="text" name="entyName" class="form-control" placeholder="Role name"
+                                    required>
+                            </div>
+
+                            <!-- DESCRIPTION -->
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea name="entyDesc" class="form-control" rows="4"
+                                    placeholder="Description of the role" maxlength="200" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-sm btn-warning">
+                            Clear
+                        </button>
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="bi bi-save"></i>
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div><!--END ROLE MODAL-->
 
     <!--ADD SCHOOL MODAL-->
     <div class="modal fade" id="addBranchModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
 
-                <form th:action="@{/admin/branches/save}" th:object="${branch}" method="post">
+                <form th:action="@{/admin/branches/save}" method="post" enctype="multipart/form-data"
+                    accept="application/pdf">
 
-                    <div class="modal-header">
-                        <h5 class="modal-title">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title fw-bold">
                             <i class="bi bi-building-add"></i> Add School
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -799,27 +1847,55 @@
                     <div class="modal-body">
                         <div class="row g-3">
 
-                            <div class="col-md-8">
+                            <div class="col-md-6">
                                 <label class="form-label">School Name</label>
-                                <input type="text" th:field="*{name}" class="form-control" placeholder="Main Branch"
-                                    required>
+                                <input type="text" name="name" class="form-control" placeholder="Main Branch" required>
                             </div>
 
-                            <div class="col-md-4">
-                                <label class="form-label">School Code</label>
-                                <input type="text" th:field="*{code}" class="form-control" placeholder="HQ" required>
+                            <div class="col-md-3">
+                                <label class="form-label">Level</label>
+
+                                <select class="form-control" name="type" required>
+                                    <option value="">SELECT</option>
+                                    <option value="NURSERY">Nursery</option>
+                                    <option value="PRIMARY">Primary</option>
+                                    <option value="JUNIOR">Junior</option>
+                                    <option value="SENIOR">Senior</option>
+                                    <option value="ELEMENTARY">Elementary</option>
+                                    <option value="INTERNATIONAL">International</option>
+                                    <option value="SPECIAL">Special</option>
+                                    <option value="VOCATIONAL">Vocational</option>
+                                    <option value="COMPREHENSIVE">Comprehensive</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Code</label>
+                                <input type="text" name="code" class="form-control" placeholder="HQ" required>
                             </div>
 
                             <div class="col-6">
                                 <label class="form-label">Email</label>
-                                <input type="email" th:field="*{email}" class="form-control"
-                                    placeholder="branch@example.com" required>
+                                <input type="email" name="email" class="form-control" placeholder="branch@example.com"
+                                    required>
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">Phone</label>
-                                <input type="tel" th:field="*{phone}" class="form-control" placeholder="07XXXXXXXX"
-                                    required>
+                                <input type="tel" name="phone" class="form-control" placeholder="07XXXXXXXX" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Manager</label>
+                                <input type="text" name="manager" class="form-control" placeholder="John Doe" required>
+                            </div>
+
+                            <!-- IMAGE -->
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Agreement file
+                                </label>
+                                <input name="file" type="file" class="form-control">
                             </div>
 
                             <div class="col-12">
@@ -829,7 +1905,7 @@
 
                             <div class="col-md-12">
                                 <label class="form-label">Address</label>
-                                <input type="text" name="location" class="form-control" placeholder="Nairobi" required>
+                                <input type="text" name="address" class="form-control" placeholder="Nairobi" required>
                             </div>
                             <div class="col-md-5">
                                 <label class="form-label">Latitude</label>
@@ -843,7 +1919,8 @@
                             </div>
                             <div class="col-md-2 d-flex align-items-end">
                                 <button type="button" class="btn btn-outline-primary w-100"
-                                    onclick="getLocation('New')"><i class="bi bi-crosshair"></i> GPS</button>
+                                    onclick="getLocation('New')"><i class="bi bi-crosshair"></i>
+                                    GPS</button>
                             </div>
                             <div class="col-12">
                                 <div id="mapNew" style="height: 200px; border-radius: 8px;"></div>
@@ -851,8 +1928,8 @@
                         </div>
                     </div>
 
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-sm btn-outline-warning">
+                    <div class="modal-footer border-0">
+                        <button type="reset" class="btn btn-sm btn-outline-warning">
                             Clear
                         </button>
 

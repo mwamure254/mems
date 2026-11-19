@@ -76,7 +76,37 @@ public class AnnouncementController {
         return "redirect:/announcements";
     }
 
-    @GetMapping("/delete/{id}")
+    @PostMapping("/update/{id}")
+    public String updateAnnouncement(
+            @PathVariable Long id, @AuthenticationPrincipal CustomUserDetails auth,
+            @ModelAttribute Announcement ann, @RequestParam("file") MultipartFile file,
+            RedirectAttributes redirectAttributes) {
+        try {
+            if (file != null && !file.isEmpty()) {
+                ann.setUpload(fileUpload.uploadFile(file, "profiles", redirectAttributes));
+            }
+            announcementService.update(id, ann, redirectAttributes, auth.getBranch().getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addAttribute("error", "Operation not successful.");
+        }
+        return "redirect:/announcements";
+    }
+
+    @PostMapping("/toggle/{id}")
+    public String toggle(@AuthenticationPrincipal CustomUserDetails auth,
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
+        try {
+            announcementService.toggleActive(id, redirectAttributes, auth.getBranch().getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addAttribute("error", "Operation not successful.");
+        }
+        return "redirect:/announcements";
+    }
+
+    @PostMapping("/delete/{id}")
     public String deleteAnnouncement(@AuthenticationPrincipal CustomUserDetails auth, @PathVariable Long id, RedirectAttributes red) {
         try {
             announcementService.delete(auth.getBranch().getId(), id, red);

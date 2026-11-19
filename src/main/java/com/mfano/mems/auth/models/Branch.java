@@ -21,12 +21,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Branch extends CommonObject {
-    private String location;
+    private String address;
     private String code;
     private String manager;
     private String phone;  
     private String email;
-    private String address;
+    private String type;
     
     //SIGNED AGREEMENT FORM URL
     private String document;

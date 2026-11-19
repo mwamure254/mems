@@ -2,7 +2,7 @@ package com.mfano.mems.models;
 
 import java.math.BigDecimal;
 
-import com.mfano.mems.auth.models.BaseObject;
+import com.mfano.mems.auth.models.CommonObject;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,13 +14,13 @@ import lombok.Setter;
 @Table(name = "fees")
 @Setter
 @Getter
-public class Fees extends BaseObject{
-    @Column(name = "grade_id", insertable=false, updatable=false)
+public class Fees extends CommonObject{
+    @Column(name = "grade_id")
     private Long grade; // Grade 1, Grade 2
     private Integer term; // 1,2,3
     private Integer year;
     private BigDecimal amount;
 
-    @Column(name = "branch_id", insertable=false, updatable=false)
+    @Column(name = "branch_id")
     private Long branch;
 }

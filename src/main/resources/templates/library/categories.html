@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:replace="~{partials/_header :: common_header(~{::title/text()},~{::link},~{::meta})}">
+    <!-- Custom meta data for this template-->
+    <meta name="description" content="mems categories page">
+    <meta name="author" content="mfano">
+    <!-- Custom title for this page-->
+    <title>MEMS | Categories</title>
+    <!-- Custom styles for this page-->
+</th:block>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <th:block th:insert="~{partials/_topbar}" />
+    <!-- =====End Header===== -->
+
+    <!-- ======= Sidebar ======= -->
+    <th:block th:insert="~{partials/_sidebar}" />
+    <!-- =====End Sidebar=====-->
+
+    <main id="main" class="main">
+
+        <!-- Page Heading -->
+        <div class="pagetitle d-sm-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 class="fw-bold mb-1">
+                    Book Categories
+                </h1>
+            </div>
+
+            <!-- Breadcrumb -->
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/}">
+                            <i class="bi bi-house-door me-1"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/}">Library</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Categories</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+
+        <div class="card borde-0">
+            <!-- Card Header -->
+            <div class="card-header py-3">
+                <div class="d-flex flex-column flex-md-row align-items-md-start justify-content-between">
+
+                    <!-- SEARCH -->
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+
+                            <input type="text" id="categorySearch" class="form-control"
+                                onkeyup="searchTable('categorySearch', 'categoryTable')" placeholder="Search categories...">
+                        </div>
+                    </div>
+                    <div class="mt-3 mt-md-0 d-flex flex-wrap">
+                        <!-- Export -->
+                        <div class="btn-group mx-2 mb-2">
+                            <button type="button" class="btn btn-sm btn-outline-warning dropdown-toggle"
+                                data-bs-toggle="dropdown">
+                                <i class="bi bi-download bi-sm m-1"></i>Export
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right shadow">
+                                <h6 class="dropdown-header">Export Records</h6>
+                                <a class="dropdown-item"
+                                    th:href="@{/categories/export/excel(filter=${filter})}"><i
+                                        class="bi bi-file-excel bi-sm bi-fw mr-2 text-success"></i>Excel</a>
+                                <a class="dropdown-item" th:href="@{/categories/export/pdf(filter=${filter})}"><i
+                                        class="bi bi-file-pdf bi-sm bi-fw mr-2 text-danger"></i>PDF</a>
+                                <a class="dropdown-item"
+                                    th:href="@{/categories/export/word(filter=${filter})}"><i
+                                        class="bi bi-file-word bi-sm bi-fw mr-2 text-primary"></i>WORD</a>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-outline-primary mb-2" data-bs-toggle="modal"
+                            data-bs-target="#categoryModal">
+                            <i class="bi bi-plus"></i> New category
+
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- USERS TABLE -->
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="categoryTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>CIN</th>
+                            <th>CATEGORY</th>
+                            <th>DESCRIPTION</th>
+                            <th class="text-end">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="cat, stat : ${categories}">
+                            <td th:text="${stat.count}">29 Oct 2026</td>
+                            <td th:text="${cat.reference}">29 Oct 2026</td>
+                            <td class="fw-semibold" th:text="${cat.name}">Young readers</td>
+                            <td th:text="${cat.description ?: 'Add description'}">About young readers</td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <!-- EDIT -->
+                                    <a class="text-primary m-1" data-bs-toggle="modal"
+                                        th:data-bs-target="'#editCategory' + ${cat.id}" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+
+                                    <a class="text-warning m-1" data-bs-toggle="modal"
+                                        th:data-bs-target="'#toggleCategory' + ${cat.id}"
+                                        th:title="${cat.active ? 'Deactivate' : 'Activate'}">
+                                        <i th:class="${cat.active}
+                                            ? 'bi bi-toggle-on'
+                                            : 'bi bi-toggle-off'"></i>
+                                    </a>
+
+                                    <!-- DELETE -->
+                                    <a class="text-danger m-1" data-bs-toggle="modal"
+                                        th:data-bs-target="'#deleteCategory' + ${cat.id}" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+
+                                <!-- TOGGLE CATEGORY -->
+                                <div class="modal fade" th:id="'toggleCategory' + ${cat.id}" tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header border-0">
+                                                <h5 class="modal-title fw-bold">
+                                                    <span th:text="${cat.active ? 'Deactivate' : 'Activate'}"></span>
+                                                     Category
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                </button>
+                                            </div>
+                                            <div class="modal-body text-start">
+                                                Are you sure you want to <span
+                                                    th:text="${cat.active ? 'Deactivate ' : 'Activate '}"></span>
+                                                <strong>
+                                                    this categories
+                                                </strong>?
+                                                <br>
+                                                <small class="text-danger">
+                                                    This action can be undone at a fee.
+                                                </small>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-sm btn-secondary"
+                                                    data-bs-dismiss="modal">
+                                                    Cancel
+                                                </button>
+                                                <form th:action="@{/categories/toggle/{id}(id=${cat.id})}"
+                                                    method="post">
+                                                    <button type="submit" class="" th:class="${cat.active}
+                                            ? 'btn btn-sm btn-danger'
+                                            : 'btn btn-sm btn-success'">
+                                                        <span th:text="${cat.active ? 'Deactivate' : 'Activate'}">
+                                                            Toggle <span>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--END TOGGLE MODAL-->
+
+                                <!-- DELETE MODAL -->
+                                <div class="modal fade" th:id="'deleteCategory' + ${cat.id}" tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header border-0">
+                                                <h5 class="modal-title fw-bold">
+                                                    Delete Category
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                                </button>
+                                            </div>
+                                            <div class="modal-body text-start">
+                                                Are you sure you want to delete
+                                                <strong>
+                                                    this category
+                                                </strong>?
+                                                <br>
+                                                <small class="text-danger">
+                                                    This action cannot be undone.
+                                                </small>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-sm btn-secondary"
+                                                    data-bs-dismiss="modal">
+                                                    Cancel
+                                                </button>
+                                                <form th:action="@{/categories/delete/{id}(id=${cat.id})}"
+                                                    method="post">
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        <i class="bi bi-trash"></i>
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><!--END DELETE MODAL-->
+                            </td>
+
+                            <!-- EDIT CATEGORY MODAL -->
+                            <div class="modal fade" th:id="'editCategory' + ${cat.id}" tabindex="-1"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <form th:action="@{/categories/update/{id}(id=${cat.id})}" method="post">
+                                        <div class="modal-content">
+                                            <!-- HEADER -->
+                                            <div class="modal-header border-0">
+                                                <h5 class="modal-title fw-bold">Edit Category</h5>
+                                                <button type="button" class="btn-close"
+                                                    data-bs-dismiss="modal"></button>
+                                            </div>
+
+                                            <!-- BODY -->
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <!-- TITLE -->
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Title *</label>
+                                                        <input type="text" name="name" th:value="${cat.name}"
+                                                            class="form-control" required>
+                                                    </div>
+
+                                                <!-- DESCRIPTION -->
+                                                <div class="mb-3">
+                                                    <label class="form-label">Description *</label>
+                                                    <textarea name="description" th:text="${cat.description}"
+                                                        class="form-control" rows="4" required></textarea>
+                                                </div>
+                                            </div>
+
+                                            <!-- FOOTER -->
+                                            <div class="modal-footer">
+                                                <button type="reset" class="btn btn-warning">Clear</button>
+                                                <button type="submit" class="btn btn-success">Save</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </tr>
+
+                        <!-- EMPTY -->
+                        <tr th:if="${#lists.isEmpty(categories)}">
+                            <td colspan="7" class="text-center py-5">
+                                <h5 class="mt-3">
+                                    No categories for now
+                                </h5>
+                                <p class="text-muted">
+                                    Publish your first annocategoriesuncement to get started.
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Card Footer -->
+            <div class="card-footer bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Records are maintained for security and accountability.
+                    </small>
+                    <span class="badge bg-secondary" th:if="${categories != null}"
+                        th:text="${#lists.size(categories) + ' Entries'}">0 Entries</span>
+                </div>
+            </div>
+        </div>
+    </main><!-- End #main -->
+
+    <!-- ADD CATEGORY MODAL -->
+    <div class="modal fade" id="categoryModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form th:action="@{/categories/save}" method="post">
+                <div class="modal-content">
+                    <!-- HEADER -->
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title fw-bold">New Category</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <!-- BODY -->
+                    <div class="modal-body">
+                        <input type="hidden" name="branch" id="annBranch" th:value="${author.branch?.id}">
+
+                        <!-- TITLE -->
+                        <div class="mb-3">
+                            <label class="form-label">Title *</label>
+                            <input type="text" name="name" id="catTitle" class="form-control" required>
+                        </div>
+
+                        <!-- DESCRIPTION -->
+                        <div class="mb-3">
+                            <label class="form-label">Description *</label>
+                            <textarea name="description" id="catDescription" class="form-control" rows="4"
+                                required></textarea>
+                        </div>
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="modal-footer">
+                        <button type="reset" class="btn btn-warning">Clear</button>
+                        <button type="submit" class="btn btn-success">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- =====footer===== -->
+    <th:block th:insert="~{partials/_footer}" />
+</body>
+
+</html>

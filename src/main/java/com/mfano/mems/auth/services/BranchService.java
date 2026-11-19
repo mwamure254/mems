@@ -1,11 +1,13 @@
 package com.mfano.mems.auth.services;
 
 import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.mfano.mems.auth.models.Branch;
 import com.mfano.mems.auth.repositories.BranchRepository;
+import com.mfano.mems.config.CustomUserDetails;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,6 +16,24 @@ import lombok.RequiredArgsConstructor;
 public class BranchService {
     private final BranchRepository branchRepository;
     private final AuditService auditService;
+
+    public List<Branch> findAll() {
+        return branchRepository.findAllByOrderByCreatedAtDesc();
+    }
+    
+    public List<Branch> findAll(CustomUserDetails auth) {
+        return branchRepository.findAll().stream()
+        .filter(entry -> entry.getId() == auth.getBranch().getId())
+        .toList();
+    }
+
+    public Branch findById(Long id) {
+        return branchRepository.findById(id).orElse(null);
+    }
+
+    public Branch findByName(String name) {
+        return branchRepository.findByName(name);
+    }
 
     public void createBranch(Branch branch, Long user,
             RedirectAttributes redirectAttributes) {
@@ -30,10 +50,6 @@ public class BranchService {
         }
     }
 
-    public Branch getBranchById(Long id) {
-        return branchRepository.findById(id).orElse(null);
-    }
-
     public void deleteBranch(Long user, Long id, RedirectAttributes red) {
         Branch existingBranch = findById(id);
         if (existingBranch != null) {
@@ -47,30 +63,6 @@ public class BranchService {
         }
     }
 
-    public void updateBranch(Long user, Long id, Branch updatedBranch) {
-        Branch existingBranch = findById(id);
-        if (existingBranch != null) {
-            branchRepository.save(updatedBranch);
-            auditService.record(user, "update_branch", "SUCCESS", "Updated branch " + existingBranch.getName());
-        }
-    }
-
-    public List<Branch> getAllBranches() {
-        return branchRepository.findAll();
-    }
-
-    public List<Branch> findAll() {
-        return branchRepository.findAll();
-    }
-
-    public Branch findById(Long id) {
-        return branchRepository.findById(id).orElse(null);
-    }
-
-    public Branch findByName(String name) {
-        return branchRepository.findByName(name);
-    }
-
     public void updateBranch(Long b, Long id, Branch br, RedirectAttributes redirectAttributes) {
         Branch branch = findById(id);
         if (branch == null) {
@@ -78,9 +70,16 @@ public class BranchService {
                     "error", "Branch not found: " + id);
         } else {
             branch.setName(br.getName());
-            branch.setLocation(br.getLocation());
+            branch.setAddress(br.getAddress());
+            branch.setLatitude(br.getLatitude());
+            branch.setLongitude(br.getLongitude());
+            branch.setDescription(br.getDescription());
+            branch.setCode(br.getCode());
             branch.setPhone(br.getPhone());
             branch.setEmail(br.getEmail());
+            branch.setType(br.getType());
+            branch.setDocument(br.getDocument());
+            branch.setManager(br.getManager());
 
             branchRepository.save(branch);
             auditService.record(b, "update_branch", "SUCCESS", "Updated branch " + branch.getName());

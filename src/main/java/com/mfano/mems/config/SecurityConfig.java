@@ -45,7 +45,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 
                                 // Protected pages
                                 .requestMatchers("/**/dashboard").authenticated()
-                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/admin/**").hasAnyRole("ADMIN", "PRINCIPAL")
                                 .requestMatchers("/principal/**").hasRole("PRINCIPAL")
                                 .requestMatchers("/teacher/**").hasRole("TEACHER")
                                 .requestMatchers("/bursar/**").hasRole("BURSAR")

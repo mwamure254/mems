@@ -1,7 +1,7 @@
 package com.mfano.mems.models;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+//import java.time.LocalDate;
 
 import com.mfano.mems.auth.models.CommonObject;
 
@@ -16,15 +16,15 @@ import lombok.Setter;
 @Setter
 @Getter
 public class Payment extends CommonObject{
-    @Column(name = "student_id", insertable=false, updatable=false)
+    @Column(name = "student_id")
     private Long student;
     private BigDecimal amountPaid;
     private Integer forTerm; // 1,2,3
     private Integer forYear;
-    private String paymentMethod; // M-Pesa, Bank, Cash
+    private String paymentMethod; // M-Pesa, Bank, Cash, Airtel Money
     private String transactionReference; // M-Pesa code
-    private LocalDate datePaid;
+    //private LocalDate datePaid;
 
-    @Column(name = "branch_id", insertable=false, updatable=false)
+    @Column(name = "branch_id")
     private Long branch;
 }

@@ -34,8 +34,8 @@ public class User extends BaseObject {
     @Column(unique = true)
     private String email;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "branch_id", nullable = true)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "branch_id")
     private Branch branch;
 
     @ManyToMany(fetch = FetchType.EAGER)

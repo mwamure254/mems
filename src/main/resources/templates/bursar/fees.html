@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:replace="~{partials/_header :: common_header(~{::title/text()},~{::link},~{::meta})}">
+    <!-- Custom meta data for this template-->
+    <meta name="description" content="mems examination page">
+    <meta name="author" content="mfano">
+    <!-- Custom title for this page-->
+    <title>MEMS | Examination</title>
+    <!-- Custom styles for this page-->
+</th:block>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <th:block th:insert="~{partials/_topbar}" />
+    <!-- =====End Header===== -->
+
+    <!-- ======= Sidebar ======= -->
+    <th:block th:insert="~{partials/_sidebar}" />
+    <!-- =====End Sidebar=====-->
+
+    <main id="main" class="main">
+
+        <!-- Page Heading -->
+        <div class="pagetitle d-sm-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 class="fw-bold mb-1">
+                    Examination
+                </h1>
+
+                <p class="text-muted mb-0">
+                    Examination for the school
+                </p>
+            </div>
+
+            <!-- Breadcrumb -->
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/}">
+                            <i class="bi bi-house-door me-1"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/}">User</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Examination</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+
+        <!-- TABS -->
+        <ul class="nav nav-pills mb-3">
+            <li class="nav-item">
+                <a class="nav-link active" id="out-tab" data-bs-toggle="pill" href="#transferOut"
+                    style="background:#013220; color:white;">Transfer out</a>
+            </li>
+            <li class="nav-item ms-2">
+                <a class="nav-link" id="in-tab" data-bs-toggle="pill" href="#transferIn" style="color:#013220;">Transfer
+                    in</a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- TRANSFER OUT FORM -->
+            <div class="tab-pane fade show active" id="transferOut">
+                <small class="text-danger">
+                    This action cannot be undone.
+                </small>
+            </div>
+
+            <!-- TRANSFER IN FORM -->
+            <div class="tab-pane fade" id="transferIn">
+                <small class="text-danger">
+                    This action cannot be undone.
+                </small>
+            </div>
+        </div>
+
+    </main><!-- End #main -->
+
+    <!-- ADD ANNOUNCEMENT MODAL -->
+    <div class="modal fade" id="announcementModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form th:action="@{/announcements/save}" method="post" enctype="multipart/form-data"
+                accept="application/pdf">
+                <div class="modal-content">
+                    <!-- HEADER -->
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title fw-bold">New announcement</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <!-- BODY -->
+                    <div class="modal-body">
+                        <input type="hidden" name="branch" id="annBranch" th:value="${author.branch?.id}">
+
+                        <div class="row">
+                            <!-- TITLE -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Title *</label>
+                                <input type="text" name="name" id="annTitle" class="form-control" required>
+                            </div>
+
+                            <!-- AUDIENCE -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Audience *</label>
+                                <select name="audience" id="annAudience" class="form-select" required>
+                                    <option value="">SELECT</option>
+                                    <option th:each="r : ${roles}" th:value="${r.id}"
+                                        th:text="${r.name == 'USER' ? 'ALL' : r.name}" required>
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- MESSAGE -->
+                        <div class="mb-3">
+                            <label class="form-label">Message *</label>
+                            <textarea name="description" id="annMessage" class="form-control" rows="4"
+                                required></textarea>
+                        </div>
+
+                        <!-- FILE -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Select attachement
+                            </label>
+                            <input name="file" type="file" class="form-control">
+                        </div>
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-warning">Clear</button>
+                        <button type="submit" class="btn btn-success">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- =====footer===== -->
+    <th:block th:insert="~{partials/_footer}" />
+</body>
+
+</html>

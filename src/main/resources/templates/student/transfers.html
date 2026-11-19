@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:replace="~{partials/_header :: common_header(~{::title/text()},~{::link},~{::meta})}">
+    <!-- Custom meta data for this template-->
+    <meta name="description" content="mems transfers page">
+    <meta name="author" content="mfano">
+    <!-- Custom title for this page-->
+    <title>MEMS | Transfers</title>
+    <!-- Custom styles for this page-->
+</th:block>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <th:block th:insert="~{partials/_topbar}" />
+    <!-- =====End Header===== -->
+
+    <!-- ======= Sidebar ======= -->
+    <th:block th:insert="~{partials/_sidebar}" />
+    <!-- =====End Sidebar=====-->
+
+    <main id="main" class="main">
+
+        <!-- Page Heading -->
+        <div class="pagetitle d-sm-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 class="fw-bold mb-1">
+                    Student Transfers
+                </h1>
+
+                <p class="text-muted mb-0">
+                    Students moving in and out of the school
+                </p>
+            </div>
+
+            <!-- Breadcrumb -->
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/}">
+                            <i class="bi bi-house-door me-1"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/}">Students</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Transfers</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+
+        <div class="row">
+            <!-- LEFT: FORM -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <!-- TABS -->
+                        <ul class="nav nav-pills mt-2">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="out-tab" data-bs-toggle="pill"
+                                    href="#transferOut">Transfer out</a>
+                            </li>
+                            <li class="nav-item ms-2">
+                                <a class="nav-link" id="in-tab" data-bs-toggle="pill" href="#transferIn">Transfer in</a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <!-- TRANSFER OUT FORM -->
+                            <div class="tab-pane fade show active" id="transferOut">
+                                <form th:action="@{/transfers/out}" method="post" class="mt-2">
+                                    <input type="hidden" name="type" value="OUT">
+                                    <input type="hidden" name="branch" id="annBranch" th:value="${author.branch?.id}">
+                                    <div class="mb-3">
+                                        <label class="form-label">Student *</label>
+                                        <select name="student" class="form-select" required>
+                                            <option value="">SELECT</option>
+                                            <option th:each="s : ${students}" th:value="${s.id}"
+                                                th:text="${s.firstName + ' ' + s.lastName + ' - ' + s.admissionNumber}">
+                                                JUSTIN
+                                                NGAO</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Destination school *</label>
+                                        <input type="text" name="schoolName" class="form-control"
+                                            placeholder="ST. ANDREWS MALINDI" required>
+                                    </div>
+
+                                    <!-- DATE -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Date</label>
+                                        <input type="date" name="transferDate" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Reason</label>
+                                        <textarea name="reason" class="form-control" rows="4"
+                                            placeholder="example: Relocation etc"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn w-100"
+                                        style="background:#02967b; color:white;">Record
+                                        Transfer</button>
+                                </form>
+                            </div>
+
+                            <!-- TRANSFER IN FORM -->
+                            <div class="tab-pane fade" id="transferIn">
+                                <form th:action="@{/transfers/in}" method="post" class="mt-2">
+                                    <input type="hidden" name="type" value="IN">
+                                    <input type="hidden" name="branch" id="annBranch" th:value="${author.branch?.id}">
+                                    <div class="mb-3">
+                                        <label class="form-label">Student *</label>
+                                        <select name="student" class="form-select" required>
+                                            <option value="">SELECT</option>
+                                            <option th:each="s : ${students}" th:value="${s.id}"
+                                                th:text="${s.firstName + ' ' + s.lastName + ' - ' + s.admissionNumber}">
+                                                JUSTIN
+                                                NGAO</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Previous school *</label>
+                                        <input type="text" name="schoolName" class="form-control"
+                                            placeholder="ST. ANDREWS MALINDI" required>
+                                    </div>
+
+                                    <!-- DATE -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Date</label>
+                                        <input type="date" name="transferDate" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Reason</label>
+                                        <textarea name="reason" class="form-control" rows="4"
+                                            placeholder="example: Relocation etc"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn w-100"
+                                        style="background:#02967b; color:white;">Record
+                                        Transfer</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: HISTORY TABLE -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+
+                    <!-- Card Header -->
+                    <div class="card-header py-3">
+                        <div class="d-flex flex-column flex-md-row align-items-md-start justify-content-between">
+
+                            <!-- SEARCH -->
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-search"></i>
+                                    </span>
+
+                                    <input type="text" id="transferSearch" class="form-control"
+                                        onkeyup="searchTable('transferSearch', 'transferTable')"
+                                        placeholder="Search transfers...">
+                                </div>
+                            </div>
+                            <div class="mt-3 mt-md-0 d-flex flex-wrap">
+                                <!-- Export -->
+                                <div class="btn-group mx-2 mb-2">
+                                    <button type="button" class="btn btn-sm btn-outline-warning dropdown-toggle"
+                                        data-bs-toggle="dropdown">
+                                        <i class="bi bi-download bi-sm m-1"></i>Export
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right shadow">
+                                        <h6 class="dropdown-header">Export Records</h6>
+                                        <a class="dropdown-item"
+                                            th:href="@{/transfers/export/excel(filter=${filter})}"><i
+                                                class="bi bi-file-excel bi-sm bi-fw mr-2 text-success"></i>Excel</a>
+                                        <a class="dropdown-item" th:href="@{/transfers/export/pdf(filter=${filter})}"><i
+                                                class="bi bi-file-pdf bi-sm bi-fw mr-2 text-danger"></i>PDF</a>
+                                        <a class="dropdown-item"
+                                            th:href="@{/transfers/export/word(filter=${filter})}"><i
+                                                class="bi bi-file-word bi-sm bi-fw mr-2 text-primary"></i>WORD</a>
+                                    </div>
+                                </div>
+
+                                <!-- Filter -->
+                                <div class="btn-group mr-2 mb-2 px-2">
+                                    <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle"
+                                        data-bs-toggle="dropdown">
+                                        <i class="bi bi-filter bi-sm m-1"></i>Filter
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right shadow">
+                                        <h6 class="dropdown-header">Filter By Type</h6>
+                                        <a class="dropdown-item" th:href="@{/transfers(filter='IN')}">Transfer
+                                            IN</a>
+                                        <a class="dropdown-item" th:href="@{/transfers(filter='OUT')}">Transfer
+                                            OUT</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" th:href="@{/transfers}">All Entries</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="transferTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>DATE</th>
+                                    <th>STUDENT</th>
+                                    <th>TYPE</th>
+                                    <th>SCHOOL</th>
+                                    <th class="text-end">ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="t, stat : ${transfers}">
+                                    <td th:text="${stat.count}">11</td>
+                                    <td th:text="${#temporals.format(t.transferDate, 'yyyy-MM-dd')}">2026-10-29</td>
+                                    <td
+                                        th:text="${transferredStudent[t.student]?.firstName + ' ' + transferredStudent[t.student]?.lastName}">
+                                        JUSTIN NGAO</td>
+                                    <td>
+                                        <span th:if="${t.type == 'OUT'}"
+                                            class="badge rounded-pill bg-light text-warning">Out</span>
+                                        <span th:if="${t.type == 'IN'}" class="badge rounded-pill bg-light text-success">In</span>
+                                    </td>
+                                    <td th:text="${t.schoolName}">ST. ANDREWS MALINDI</td>
+                                    <td th:text="${t.reason}" class="text-end">Relocation</td>
+                                </tr>
+
+                                <!-- EMPTY -->
+                                <tr th:if="${#lists.isEmpty(transfers)}">
+                                    <td colspan="6" class="text-center py-5">
+                                        <h5 class="mt-3">
+                                            No transfers for now.
+                                        </h5>
+                                        <p class="text-muted">
+                                            Record your first transfer to get started.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Card Footer -->
+                    <div class="card-footer bg-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Records are maintained for security and accountability.
+                            </small>
+                            <span class="badge bg-secondary" th:if="${transfers != null}"
+                                th:text="${#lists.size(transfers) + ' Entries'}">0 Entries</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main><!-- End #main -->
+
+    <!-- =====footer===== -->
+    <th:block th:insert="~{partials/_footer}" />
+</body>
+
+</html>

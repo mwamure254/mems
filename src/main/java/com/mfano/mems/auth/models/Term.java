@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class Term extends BaseObject{
-    private Integer term; // 1,2,3
-    private Integer year;
+    private Integer t; // 1,2,3
+    private Integer y;
+    String comments;
 }

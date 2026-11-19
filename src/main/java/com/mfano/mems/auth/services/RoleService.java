@@ -9,6 +9,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.mfano.mems.auth.models.Role;
 import com.mfano.mems.auth.models.User;
 import com.mfano.mems.auth.repositories.RoleRepository;
+import com.mfano.mems.dtos.EntityDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +22,11 @@ public class RoleService {
     // Get All Roles
     public List<Role> findAll() {
         return roleRepository.findAll();
+    }
+    public List<Role> findFor() {
+        return roleRepository.findAll().stream()
+        .filter(entry -> entry.getName() != "ADMIN")
+        .toList();
     }
 
     // Get Role By Id
@@ -46,10 +52,13 @@ public class RoleService {
     }
 
     // Save Role
-    public void save(Role role, RedirectAttributes red, Long branch) {
+    public void save(EntityDto role, RedirectAttributes red, Long branch) {
+        Role r = new Role();
         if (role != null) {
-            roleRepository.save(role);
-            auditService.record(branch, "CREATE_ROLE", "SUCCESS", "Created role: " + role.getName());
+            r.setName(role.getEntyName());
+            r.setDescription(role.getEntyDesc());
+            roleRepository.save(r);
+            auditService.record(branch, "CREATE_ROLE", "SUCCESS", "Created role: " + r.getName());
             red.addFlashAttribute("message", "Role created successfully!");
         } else {
             red.addFlashAttribute("error", "Invalid role object.");
@@ -57,10 +66,13 @@ public class RoleService {
     }
 
     // Update Role
-    public void update(Long id, Role role, RedirectAttributes red, Long branch) {
-        if (findById(id) != null) {
-            roleRepository.save(role);
-            auditService.record(branch, "UPDATE_ROLE", "SUCCESS", "Created role: " + role.getName());
+    public void update(Long id, EntityDto role, RedirectAttributes red, Long branch) {
+        Role r = findById(id);
+        if (r != null) {
+            r.setName(role.getEntyName());
+            r.setDescription(role.getEntyDesc());
+            roleRepository.save(r);
+            auditService.record(branch, "UPDATE_ROLE", "SUCCESS", "Updated role: " + r.getName());
             red.addFlashAttribute(
                     "message",
                     "Role updated successfully.");
@@ -70,7 +82,6 @@ public class RoleService {
                     "error",
                     "Role not found.");
         }
-
     }
 
     public List<Role> getUserNotRoles(User user) {
